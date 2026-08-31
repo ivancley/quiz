@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "admin:hash": "node scripts/gerar-hash-de-senha.ts",
     "build": "next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.ts",

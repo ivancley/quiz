@@ -1,0 +1,76 @@
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--canvas);
+}
+
+.cartao {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio-grande);
+  box-shadow: 0 8px 0 var(--afundado);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sobretitulo {
+  font-size: 10px;
+  color: var(--amarelo);
+}
+
+.titulo {
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rotulo {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.entrada {
+  min-height: 52px;
+  padding: 0 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 16px;
+}
+
+.entrada:focus {
+  border-color: var(--azul);
+  outline: none;
+}
+
+.erro {
+  padding: 12px 14px;
+  background: var(--vermelho-fundo);
+  border: 2px solid var(--vermelho);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto);
+  font-size: 14px;
+}
+
+.rodape {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto-terciario);
+  text-align: center;
+}

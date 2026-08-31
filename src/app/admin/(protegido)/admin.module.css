@@ -1,0 +1,56 @@
+.area {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 32px;
+  background: var(--tela);
+  border-bottom: 3px solid var(--borda);
+}
+
+.marca {
+  font-size: 13px;
+  color: var(--amarelo);
+  text-decoration: none;
+}
+
+.identificacao {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.email {
+  font-size: 13px;
+  color: var(--texto-terciario);
+}
+
+.conteudo {
+  flex: 1;
+  padding: 32px;
+}
+
+.abertura {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.titulo {
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.explicacao {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  max-width: 560px;
+}
