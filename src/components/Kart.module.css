@@ -1,0 +1,45 @@
+.kart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-style: solid;
+  line-height: 1;
+  user-select: none;
+}
+
+.pequeno {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--raio-pequeno);
+  border-width: 2px;
+  font-size: 10px;
+  --relevo: 2px;
+}
+
+.medio {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border-width: 3px;
+  font-size: 13px;
+  --relevo: 3px;
+}
+
+.grande {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--raio);
+  border-width: 3px;
+  font-size: 20px;
+  --relevo: 4px;
+}
+
+.enorme {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--raio-grande);
+  border-width: 4px;
+  font-size: 30px;
+  --relevo: 6px;
+}

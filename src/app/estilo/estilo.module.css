@@ -1,0 +1,64 @@
+.pagina {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  background: var(--canvas);
+  min-height: 100dvh;
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sobretitulo {
+  font-size: 11px;
+  color: var(--amarelo);
+}
+
+.titulo {
+  font-size: 28px;
+  line-height: 1.5;
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 24px;
+  border-top: 2px solid var(--borda);
+}
+
+.rotulo {
+  font-size: 11px;
+  color: var(--azul);
+  font-weight: 400;
+}
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+}
+
+.amostra {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--raio-pequeno);
+  border: 3px solid var(--texto);
+}
+
+.corpo {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  max-width: 640px;
+}
+
+.numero {
+  font-size: 46px;
+  color: var(--amarelo);
+}

@@ -1,0 +1,120 @@
+/*
+ * Grand Prix do Conhecimento — tema escuro único, estética de kart 16-bit.
+ * O relevo é sempre sombra dura sem desfoque: é a assinatura visual, e trocar
+ * por sombra difusa descaracteriza a interface inteira.
+ */
+
+:root {
+  /* Superfícies, do fundo para a frente */
+  --canvas: #0b0e1c;
+  --tela: #12162a;
+  --superficie: #171d38;
+  --afundado: #0d1122;
+
+  /* Bordas */
+  --borda: #232a4e;
+  --borda-sutil: #2a3157;
+
+  /* Texto */
+  --texto: #f6f1e4;
+  --texto-secundario: #9aa4cf;
+  --texto-terciario: #6f7aad;
+
+  /* Acentos, cada um com a sombra dura correspondente */
+  --amarelo: #f2c14a;
+  --amarelo-sombra: #7a611f;
+  --amarelo-escuro: #d19f2e;
+  --azul: #4aa8e0;
+  --azul-sombra: #24597a;
+  --azul-texto: #08182a;
+  --verde: #4cbf72;
+  --verde-sombra: #2b7846;
+  --verde-fundo: #16301f;
+  --verde-texto: #08170e;
+  --vermelho: #e0463c;
+  --vermelho-sombra: #8c1f19;
+  --vermelho-fundo: #3a1a18;
+
+  --raio: 14px;
+  --raio-pequeno: 8px;
+  --raio-grande: 20px;
+
+  color-scheme: dark;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--canvas);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--texto);
+  font-family: var(--fonte-corpo), Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* Rótulos, números e títulos curtos usam a pixel; o corpo usa a de leitura. */
+.pixel {
+  font-family: var(--fonte-pixel), ui-monospace, monospace;
+  letter-spacing: 0.5px;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--azul);
+}
+
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}
+
+@keyframes piscar {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes correr {
+  to {
+    background-position-x: -24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

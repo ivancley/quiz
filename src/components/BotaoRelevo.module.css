@@ -1,0 +1,75 @@
+/*
+ * O botão afunda no toque: a sombra dura encurta e o corpo desce a mesma
+ * distância, então o topo se mantém no lugar e o movimento parece físico.
+ */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1;
+  box-shadow: 0 4px 0 var(--tom-sombra);
+  transition:
+    transform 60ms ease-out,
+    box-shadow 60ms ease-out;
+}
+
+.botao:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--tom-sombra);
+}
+
+.botao:disabled {
+  background: var(--afundado);
+  color: var(--texto-terciario);
+  border: 2px solid var(--borda-sutil);
+  box-shadow: none;
+}
+
+.largo {
+  width: 100%;
+  min-height: 68px;
+  font-size: 13px;
+}
+
+.verde {
+  --tom-sombra: var(--verde-sombra);
+  background: var(--verde);
+  color: var(--verde-texto);
+}
+
+.vermelho {
+  --tom-sombra: var(--vermelho-sombra);
+  background: var(--vermelho);
+  color: var(--texto);
+}
+
+.azul {
+  --tom-sombra: var(--azul-sombra);
+  background: var(--azul);
+  color: var(--azul-texto);
+}
+
+.amarelo {
+  --tom-sombra: var(--amarelo-sombra);
+  background: var(--amarelo);
+  color: #2a2312;
+}
+
+.neutro {
+  --tom-sombra: transparent;
+  background: var(--afundado);
+  color: var(--texto-secundario);
+  border: 2px solid var(--borda-sutil);
+  box-shadow: none;
+}
+
+.neutro:hover:not(:disabled) {
+  border-color: var(--azul);
+  color: var(--texto);
+}
