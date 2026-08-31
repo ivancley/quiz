@@ -15,7 +15,10 @@ type Props = {
 export function Moldura({ children, fundo }: Props) {
   return (
     <div className={estilos.centralizador}>
-      <div className={estilos.moldura} style={fundo ? { background: fundo } : undefined}>
+      <div
+        className={estilos.moldura}
+        style={fundo ? { background: fundo } : undefined}
+      >
         {children}
       </div>
     </div>

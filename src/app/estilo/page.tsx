@@ -33,14 +33,24 @@ export default function Estilo() {
         <h2 className={`pixel ${estilos.rotulo}`}>KARTS</h2>
         <div className={estilos.linha}>
           {nomes.map((nome, i) => (
-            <Kart key={nome} participanteId={`kart-${i}`} nome={nome} tamanho="grande" />
+            <Kart
+              key={nome}
+              participanteId={`kart-${i}`}
+              nome={nome}
+              tamanho="grande"
+            />
           ))}
         </div>
         <div className={estilos.linha}>
           <Kart participanteId="kart-0" nome="Marina" tamanho="pequeno" />
           <Kart participanteId="kart-1" nome="Rafael" tamanho="medio" />
           <Kart participanteId="kart-2" nome="Juliana" tamanho="grande" />
-          <Kart participanteId="kart-0" nome="Campeã" tamanho="enorme" destacado />
+          <Kart
+            participanteId="kart-0"
+            nome="Campeã"
+            tamanho="enorme"
+            destacado
+          />
         </div>
       </section>
 
@@ -63,7 +73,10 @@ export default function Estilo() {
             <span
               key={cor.fundo}
               className={estilos.amostra}
-              style={{ background: cor.fundo, boxShadow: `0 4px 0 ${cor.sombra}` }}
+              style={{
+                background: cor.fundo,
+                boxShadow: `0 4px 0 ${cor.sombra}`,
+              }}
             />
           ))}
         </div>
@@ -72,8 +85,8 @@ export default function Estilo() {
       <section className={estilos.secao}>
         <h2 className={`pixel ${estilos.rotulo}`}>TIPOGRAFIA</h2>
         <p className={estilos.corpo}>
-          Na BNCC, o que as competências gerais descrevem? O corpo usa a fonte de
-          leitura; rótulos, números e títulos curtos usam a pixel.
+          Na BNCC, o que as competências gerais descrevem? O corpo usa a fonte
+          de leitura; rótulos, números e títulos curtos usam a pixel.
         </p>
         <p className={`pixel ${estilos.numero}`}>54 PTS</p>
       </section>

@@ -1,4 +1,7 @@
 .next/
+.next-e2e/
 node_modules/
+playwright-report/
+test-results/
 drizzle/
 .claude/specs/quiz-ao-vivo/design/

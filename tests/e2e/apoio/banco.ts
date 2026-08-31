@@ -93,7 +93,10 @@ export async function semearQuiz(roteiro: Roteiro) {
       .returning()
 
     const perguntas = []
-    for (const [posicao, roteiroDaPergunta] of roteiroDaEtapa.perguntas.entries()) {
+    for (const [
+      posicao,
+      roteiroDaPergunta,
+    ] of roteiroDaEtapa.perguntas.entries()) {
       const alternativas = roteiroDaPergunta.alternativas ?? ALTERNATIVAS_PADRAO
       const [perguntaCriada] = await db
         .insert(pergunta)

@@ -118,7 +118,10 @@ export const participante = pgTable(
   },
   (t) => [
     // Dois "Marina" na mesma sala tornariam o placar projetado ambíguo.
-    uniqueIndex('participante_nome_unico').on(t.sessaoId, sql`lower(${t.nome})`),
+    uniqueIndex('participante_nome_unico').on(
+      t.sessaoId,
+      sql`lower(${t.nome})`
+    ),
     index('participante_por_sessao').on(t.sessaoId, t.entrouEm),
   ]
 )
@@ -145,7 +148,10 @@ export const resposta = pgTable(
   (t) => [
     // A resposta é definitiva; sem isso o bônus de velocidade seria burlável.
     unique('resposta_unica_por_pergunta').on(t.participanteId, t.perguntaId),
-    check('resposta_escolhida_valida', sql`${t.escolhida} IN ('A','B','C','D')`),
+    check(
+      'resposta_escolhida_valida',
+      sql`${t.escolhida} IN ('A','B','C','D')`
+    ),
     index('resposta_por_pergunta').on(t.perguntaId, t.respondidaEm, t.id),
   ]
 )

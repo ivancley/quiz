@@ -17,7 +17,10 @@ export const viewport: Viewport = {
 
 export default function LayoutRaiz({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${fontePixel.variable} ${fonteCorpo.variable}`}>
+    <html
+      lang="pt-BR"
+      className={`${fontePixel.variable} ${fonteCorpo.variable}`}
+    >
       <body>{children}</body>
     </html>
   )
