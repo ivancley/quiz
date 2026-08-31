@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: quiz-db
+    environment:
+      POSTGRES_USER: quiz
+      POSTGRES_PASSWORD: quiz
+      POSTGRES_DB: quiz
+    ports:
+      # Porta padrão do Postgres deslocada em +31 para não colidir com os outros
+      # projetos que rodam em Docker nesta máquina.
+      - '${DB_PORT:-5463}:5432'
+    volumes:
+      - quiz-db-data:/var/lib/postgresql/data
+      - ./scripts/criar-banco-de-teste.sh:/docker-entrypoint-initdb.d/criar-banco-de-teste.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U quiz -d quiz']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  quiz-db-data:
