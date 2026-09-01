@@ -183,25 +183,24 @@ export async function listarEtapas(quizId: string) {
  * do que vem pela frente.
  */
 export async function numerosDaProjecao(quizId: string) {
-  const [porEtapa, [viva]] = await Promise.all([
+  const [porEtapa, viva] = await Promise.all([
     listarEtapas(quizId),
     db
       .select({
         id: sessao.id,
-        naGrade: sql<number>`(
-          select count(*)::int from ${participante}
-          where ${participante.sessaoId} = ${sessao.id}
-        )`,
+        naGrade: count(participante.id),
       })
       .from(sessao)
-      .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada'))),
+      .leftJoin(participante, eq(participante.sessaoId, sessao.id))
+      .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada')))
+      .groupBy(sessao.id),
   ])
 
   return {
     etapas: porEtapa.length,
     perguntas: porEtapa.reduce((total, etapa) => total + etapa.perguntas, 0),
-    naGrade: viva?.naGrade ?? 0,
-    salaAberta: Boolean(viva),
+    naGrade: viva[0]?.naGrade ?? 0,
+    salaAberta: viva.length > 0,
   }
 }
 

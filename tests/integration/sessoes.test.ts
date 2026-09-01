@@ -15,6 +15,7 @@ import {
   listarSessoes,
   moverEtapa,
   moverPergunta,
+  numerosDaProjecao,
   renomearEtapa,
   sessaoVivaDoQuiz,
 } from '@/server/acoes'
@@ -130,6 +131,64 @@ describe('ciclo de vida da sessão', () => {
     await iniciarSessao(um.id)
 
     expect(await listarSessoes(outro.id)).toHaveLength(0)
+  })
+})
+
+describe('números da tela de projeção', () => {
+  it('conta as etapas e as perguntas do quiz', async () => {
+    const quiz = await criarQuiz('Formação de Professores')
+    const primeira = await criarEtapa(quiz.id, 'Currículo em ação')
+    await criarEtapa(quiz.id, 'Avaliação formativa')
+    await criarPergunta(primeira.id, PERGUNTA)
+    await criarPergunta(primeira.id, { ...PERGUNTA, texto: 'Outra' })
+
+    const numeros = await numerosDaProjecao(quiz.id)
+
+    expect(numeros.etapas).toBe(2)
+    expect(numeros.perguntas).toBe(2)
+  })
+
+  it('conta quem já entrou na sessão viva', async () => {
+    const quiz = await criarQuiz('Formação de Professores')
+    const sessao = await iniciarSessao(quiz.id)
+    await criarParticipante(sessao.id, 'Marina')
+    await criarParticipante(sessao.id, 'Rafael')
+
+    const numeros = await numerosDaProjecao(quiz.id)
+
+    expect(numeros.salaAberta).toBe(true)
+    expect(numeros.naGrade).toBe(2)
+  })
+
+  it('diz que a sala está aberta mesmo antes de alguém entrar', async () => {
+    const quiz = await criarQuiz('Formação de Professores')
+    await iniciarSessao(quiz.id)
+
+    const numeros = await numerosDaProjecao(quiz.id)
+
+    expect(numeros.salaAberta).toBe(true)
+    expect(numeros.naGrade).toBe(0)
+  })
+
+  it('não anuncia sala aberta sem sessão', async () => {
+    const quiz = await criarQuiz('Formação de Professores')
+
+    const numeros = await numerosDaProjecao(quiz.id)
+
+    expect(numeros.salaAberta).toBe(false)
+    expect(numeros.naGrade).toBe(0)
+  })
+
+  it('esquece a grade da turma anterior depois da bandeirada', async () => {
+    const quiz = await criarQuiz('Formação de Professores')
+    const manha = await iniciarSessao(quiz.id)
+    await criarParticipante(manha.id, 'Turma da manhã')
+    await finalizarSessao(manha.id)
+
+    const numeros = await numerosDaProjecao(quiz.id)
+
+    expect(numeros.salaAberta).toBe(false)
+    expect(numeros.naGrade).toBe(0)
   })
 })
 

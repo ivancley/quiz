@@ -13,3 +13,12 @@ export async function entrarComoAdmin(pagina: Page) {
     pagina.getByRole('heading', { name: 'Seus quizzes' })
   ).toBeVisible()
 }
+
+/**
+ * As ações destrutivas passam por uma confirmação do navegador, e o Playwright
+ * dispensa qualquer diálogo por padrão — sem isto, o clique em EXCLUIR seria
+ * silenciosamente cancelado e o teste passaria sem ter excluído nada.
+ */
+export function confirmarDialogos(pagina: Page) {
+  pagina.on('dialog', (dialogo) => dialogo.accept())
+}
