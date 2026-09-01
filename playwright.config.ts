@@ -12,13 +12,13 @@ export default defineConfig({
   // uma suíte tente rodar os casos da outra.
   testMatch: '**/*.spec.ts',
 
-  // Os cenários compartilham um único banco e uma única sessão de quiz ativa
-  // (RF-036), então dois arquivos em paralelo disputariam o mesmo estado.
+  // Os cenários compartilham um único banco, e um quiz só admite uma sessão
+  // viva por vez — dois arquivos em paralelo disputariam o mesmo estado.
   workers: 1,
   fullyParallel: false,
 
   // Um teste ponta a ponta daqui abre vários navegadores e espera propagação
-  // por SSE; o padrão de 30s é apertado para a sessão completa do CS-001.
+  // por SSE; o padrão de 30s é apertado para uma sessão completa de ponta a ponta.
   timeout: 90_000,
   expect: { timeout: 10_000 },
 
@@ -58,7 +58,7 @@ export default defineConfig({
       dependencies: ['preparar'],
     },
     {
-      // A tela do participante é desenhada para celular em retrato (RF-031);
+      // A tela do participante é desenhada para celular em retrato;
       // validar os fluxos móveis num viewport de desktop testaria outra coisa.
       name: 'celular',
       use: { ...devices['Pixel 7'] },

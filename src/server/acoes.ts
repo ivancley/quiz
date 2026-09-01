@@ -461,7 +461,7 @@ export async function excluirEtapa(etapaId: string) {
   })
 }
 
-export type Direcao = 'cima' | 'baixo'
+type Direcao = 'cima' | 'baixo'
 
 /** Troca a etapa de lugar com a vizinha na direção pedida. */
 export async function moverEtapa(etapaId: string, direcao: Direcao) {
@@ -506,7 +506,7 @@ export async function moverEtapa(etapaId: string, direcao: Direcao) {
  * o que este esquema acrescenta é recusar a alternativa em branco, que passaria
  * pela constraint de texto não nulo e chegaria vazia à tela do participante.
  */
-export const esquemaDePergunta = z.object({
+const esquemaDePergunta = z.object({
   texto: z.string().trim().min(1),
   altA: z.string().trim().min(1),
   altB: z.string().trim().min(1),
@@ -515,7 +515,7 @@ export const esquemaDePergunta = z.object({
   correta: z.enum(LETRAS),
 })
 
-export type DadosDePergunta = z.infer<typeof esquemaDePergunta>
+type DadosDePergunta = z.infer<typeof esquemaDePergunta>
 
 function validarPergunta(dados: unknown): DadosDePergunta {
   const lido = esquemaDePergunta.safeParse(dados)

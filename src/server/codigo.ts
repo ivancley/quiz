@@ -17,8 +17,3 @@ export function sortearCodigoDeQuiz(): string {
   }
   return codigo
 }
-
-/** Aceita o que a pessoa digitou como veio: minúsculas e espaços são comuns. */
-export function normalizarCodigo(digitado: string): string {
-  return digitado.trim().toUpperCase()
-}

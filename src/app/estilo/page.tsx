@@ -1,5 +1,6 @@
 import { BotaoRelevo } from '@/components/BotaoRelevo'
 import { Kart } from '@/components/Kart'
+import { Moldura } from '@/components/Moldura'
 import { CORES_DE_KART } from '@/lib/kart'
 
 import estilos from './estilo.module.css'
@@ -80,6 +81,22 @@ export default function Estilo() {
             />
           ))}
         </div>
+      </section>
+
+      <section className={estilos.secao}>
+        <h2 className={`pixel ${estilos.rotulo}`}>MOLDURA DE CELULAR</h2>
+        <Moldura>
+          <div className={estilos.dentroDaMoldura}>
+            <span className={`pixel ${estilos.rotulo}`}>
+              ETAPA 1 · VOLTA 2/5
+            </span>
+            <p className={estilos.corpo}>
+              É aqui que as telas do participante são desenhadas. Em celular a
+              moldura some e o conteúdo ocupa a viewport inteira.
+            </p>
+            <BotaoRelevo largo>ENTRAR NA CORRIDA</BotaoRelevo>
+          </div>
+        </Moldura>
       </section>
 
       <section className={estilos.secao}>
