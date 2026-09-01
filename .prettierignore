@@ -5,3 +5,7 @@ playwright-report/
 test-results/
 drizzle/
 .claude/specs/quiz-ao-vivo/design/
+
+# Modelo de hook, com instruções em comentário: é um arquivo para copiar e
+# preencher, não um JSON válido que o formatador consiga ler.
+.claude/skills/agent-smith/templates/hook.json

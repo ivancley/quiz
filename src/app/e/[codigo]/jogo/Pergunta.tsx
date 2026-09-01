@@ -10,7 +10,7 @@ import type { EstadoDoParticipante, Segmento } from '@/server/estado'
 
 import estilos from './jogo.module.css'
 
-type Pergunta = Extract<EstadoDoParticipante, { tela: 'pergunta' }>
+type TelaDePergunta = Extract<EstadoDoParticipante, { tela: 'pergunta' }>
 
 type Registro = { escolhida: Letra; correta: boolean }
 
@@ -34,7 +34,7 @@ export function Pergunta({
   aoResponder,
 }: {
   codigo: string
-  estado: Pergunta
+  estado: TelaDePergunta
   aoResponder: () => void
 }) {
   const { eu, etapa, pergunta, segmentos } = estado

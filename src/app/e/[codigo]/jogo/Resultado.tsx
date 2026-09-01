@@ -4,7 +4,10 @@ import { PONTO_POR_ACERTO } from '@/server/pontuacao'
 
 import estilos from './jogo.module.css'
 
-type Resultado = Extract<EstadoDoParticipante, { tela: 'resultado-etapa' }>
+type TelaDeResultado = Extract<
+  EstadoDoParticipante,
+  { tela: 'resultado-etapa' }
+>
 
 /**
  * O fecho da etapa: o que a pessoa fez, quanto valeu e onde ela está.
@@ -12,7 +15,7 @@ type Resultado = Extract<EstadoDoParticipante, { tela: 'resultado-etapa' }>
  * O ranking completo não aparece aqui — quem participa vê a própria posição, e
  * a lista inteira fica na projeção que o organizador conduz.
  */
-export function Resultado({ estado }: { estado: Resultado }) {
+export function Resultado({ estado }: { estado: TelaDeResultado }) {
   const { etapa, encerrada, volta, pontosNaEtapa, total, posicao, proxima } =
     estado
 

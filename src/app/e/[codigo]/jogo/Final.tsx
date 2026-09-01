@@ -5,7 +5,7 @@ import type { EstadoDoParticipante } from '@/server/estado'
 
 import estilos from './jogo.module.css'
 
-type Final = Extract<EstadoDoParticipante, { tela: 'final' }>
+type TelaFinal = Extract<EstadoDoParticipante, { tela: 'final' }>
 
 /**
  * A corrida acabou.
@@ -14,7 +14,7 @@ type Final = Extract<EstadoDoParticipante, { tela: 'final' }>
  * coisa: mostrar o que a pessoa fez. Mandá-la de volta à tela de nome, ou pior,
  * a uma tela de erro, apagaria a tarde inteira dela.
  */
-export function Final({ estado }: { estado: Final }) {
+export function Final({ estado }: { estado: TelaFinal }) {
   const { quiz, eu, total, posicao, naGrade } = estado
 
   return (

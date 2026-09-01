@@ -7,7 +7,7 @@ import type { Conexao } from './Jogo'
 import { Sinal } from './Sinal'
 import estilos from './jogo.module.css'
 
-type Espera = Extract<EstadoDoParticipante, { tela: 'espera' }>
+type TelaDeEspera = Extract<EstadoDoParticipante, { tela: 'espera' }>
 
 /**
  * A sala de espera. Não há nada para fazer aqui, e é justamente esse o recado:
@@ -17,7 +17,7 @@ export function Espera({
   estado,
   conexao,
 }: {
-  estado: Espera
+  estado: TelaDeEspera
   conexao: Conexao
 }) {
   const { eu, naGrade, proxima } = estado
