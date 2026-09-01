@@ -1,0 +1,271 @@
+/*
+ * Painel de condução, projetado para a sala. A pista é a leitura principal: o
+ * ranking não é uma lista, é a distância de cada kart até a linha de chegada.
+ */
+.tela {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px clamp(20px, 3vw, 44px);
+  background: var(--canvas);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--borda);
+}
+
+.situacao {
+  font-size: clamp(10px, 1vw, 13px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+}
+
+.aoVivo {
+  color: var(--verde);
+}
+
+.parada {
+  color: var(--texto-terciario);
+}
+
+.nomeDoQuiz {
+  flex: 1;
+  font-size: clamp(14px, 1.6vw, 22px);
+  line-height: 1.4;
+}
+
+.contagemDeEtapa {
+  font-size: clamp(11px, 1.2vw, 16px);
+  color: var(--amarelo);
+}
+
+.controle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 22px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: 0 6px 0 var(--afundado);
+}
+
+.etapaEmFoco {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rotulo {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.nomeDaEtapa {
+  font-size: clamp(16px, 1.8vw, 24px);
+  line-height: 1.3;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.erro {
+  padding: 12px 16px;
+  background: var(--vermelho-fundo);
+  border: 2px solid var(--vermelho);
+  border-radius: var(--raio-pequeno);
+  font-size: 15px;
+}
+
+.corpo {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 340px);
+  gap: 20px;
+  align-items: start;
+}
+
+.pista,
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.vazio {
+  padding: 20px;
+  color: var(--texto-secundario);
+  font-size: 15px;
+}
+
+.raias {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.raia {
+  display: grid;
+  grid-template-columns: 42px 1fr 160px 80px 76px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+}
+
+.posicao {
+  font-size: 16px;
+  color: var(--amarelo);
+}
+
+/* O trilho é a distância entre a largada e a linha de chegada. */
+.trilho {
+  position: relative;
+  height: 44px;
+  border-radius: var(--raio-pequeno);
+  background:
+    repeating-linear-gradient(90deg, var(--borda) 0 2px, transparent 2px 24px),
+    var(--tela);
+  border-right: 4px solid var(--amarelo);
+}
+
+.kart {
+  position: absolute;
+  top: 50%;
+  /* `left` marca a frente do kart; recuar metade dele mantém o selo dentro do
+     trilho tanto na largada quanto na chegada. */
+  transform: translate(-50%, -50%);
+  transition: left 400ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kart {
+    transition: none;
+  }
+}
+
+.nomeNaRaia {
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.numeroDoKart {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.pontos {
+  font-size: 16px;
+  color: var(--amarelo);
+  text-align: right;
+}
+
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.perguntas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pergunta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.linhaDaPergunta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.numeroDaPergunta {
+  font-size: 11px;
+  color: var(--texto-secundario);
+}
+
+.contagem {
+  font-size: 11px;
+  color: var(--amarelo);
+}
+
+.barraDeProgresso {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  overflow: hidden;
+}
+
+.preenchido {
+  height: 100%;
+  background: var(--verde);
+  transition: width 300ms ease-out;
+}
+
+.selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legenda {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+}
+
+.legenda strong {
+  color: var(--amarelo);
+}
+
+.link {
+  font-size: 14px;
+  color: var(--texto-terciario);
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--azul);
+}
+
+@media (max-width: 900px) {
+  .corpo {
+    grid-template-columns: 1fr;
+  }
+
+  .raia {
+    grid-template-columns: 36px 1fr 90px;
+  }
+
+  .numeroDoKart {
+    display: none;
+  }
+}

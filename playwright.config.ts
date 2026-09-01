@@ -46,6 +46,11 @@ export default defineConfig({
     {
       name: 'preparar',
       testMatch: '**/apoio/*.setup.ts',
+      teardown: 'encerrar',
+    },
+    {
+      name: 'encerrar',
+      testMatch: '**/apoio/*.teardown.ts',
     },
     {
       name: 'chromium',

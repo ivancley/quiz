@@ -31,19 +31,31 @@ export function hashDaSenhaDoAdministrador(): string {
     "Gere a linha com: npm run admin:hash -- 'sua-senha'."
   )
 
-  // Um hash truncado não faz o bcrypt falhar: ele apenas recusa toda senha,
-  // para sempre e sem dizer por quê. A causa quase certa é o carregador de .env
-  // do Next.js ter expandido os cifrões do hash como se fossem variáveis —
-  // motivo pelo qual o gerador entrega a linha já escapada.
-  if (!FORMA_DO_HASH.test(valor)) {
+  /*
+   * O hash é guardado com os cifrões escapados, e chega aqui de duas formas
+   * conforme quem leu o arquivo.
+   *
+   * Um hash bcrypt é feito de cifrões, e leitor de `.env` costuma tratar `$` como
+   * início de variável. O carregador do Next.js expande — e expande até o que já
+   * está no ambiente, então nem passar o valor por fora do arquivo escapa disso;
+   * o `dotenv` puro, que o Vitest e a bateria usam, não expande nada. Guardar
+   * escapado atende os dois: o do Next.js consome a barra invertida e entrega o
+   * hash cru, o outro entrega a barra junto, e é ela que se remove aqui.
+   *
+   * Sem essa normalização, o valor chega truncado e o bcrypt passa a recusar
+   * toda senha, para sempre e sem dizer por quê.
+   */
+  const hash = valor.replaceAll(String.raw`\$`, '$')
+
+  if (!FORMA_DO_HASH.test(hash)) {
     throw new Error(
-      'ADMIN_PASSWORD_HASH não tem a forma de um hash bcrypt. Se os cifrões ' +
-        'não estiverem escapados no .env, o valor chega mutilado. Regere com: ' +
-        "npm run admin:hash -- 'sua-senha' e cole a linha inteira."
+      'ADMIN_PASSWORD_HASH não tem a forma de um hash bcrypt. Regere com: ' +
+        "npm run admin:hash -- 'sua-senha' e cole a linha inteira, com os " +
+        'cifrões escapados como o gerador entrega.'
     )
   }
 
-  return valor
+  return hash
 }
 
 /**

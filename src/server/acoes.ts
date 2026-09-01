@@ -12,6 +12,7 @@ import {
   quiz,
   sessao,
 } from '@/server/db/schema'
+import { etapaEstaCompleta } from '@/server/estado'
 import { publicar } from '@/server/realtime/hub'
 
 /**
@@ -258,6 +259,106 @@ export async function finalizarSessao(sessaoId: string) {
   publicar(finalizada.id, 'todos')
 
   return finalizada
+}
+
+/**
+ * Abre a etapa: é o momento em que a pergunta vai ao ar e a sala inteira troca
+ * de tela ao mesmo tempo.
+ */
+export async function abrirEtapa(sessaoId: string, etapaId: string) {
+  const aberta = await db.transaction(async (transacao) => {
+    const [atual] = await transacao
+      .select()
+      .from(sessao)
+      .where(eq(sessao.id, sessaoId))
+
+    if (!atual) throw new RecusaDeRegra('Sessão não encontrada.', 404)
+    if (atual.status === 'finalizada') {
+      throw new RecusaDeRegra('Esta sessão já foi encerrada.', 409)
+    }
+    if (atual.etapaStatus === 'aberta') {
+      throw new RecusaDeRegra(
+        'Encerre a etapa aberta antes de começar a próxima.',
+        409
+      )
+    }
+
+    const [alvo] = await transacao
+      .select()
+      .from(etapa)
+      .where(eq(etapa.id, etapaId))
+
+    if (!alvo || alvo.quizId !== atual.quizId) {
+      throw new RecusaDeRegra('Etapa não encontrada neste quiz.', 404)
+    }
+
+    const [{ quantas }] = await transacao
+      .select({ quantas: count(pergunta.id) })
+      .from(pergunta)
+      .where(eq(pergunta.etapaId, etapaId))
+
+    // Abrir uma etapa vazia mandaria a sala para uma tela de pergunta sem
+    // pergunta, e só o encerramento manual tiraria todo mundo de lá.
+    if (quantas === 0) {
+      throw new RecusaDeRegra(
+        'Esta etapa ainda não tem perguntas. Cadastre ao menos uma antes de abrir.',
+        409
+      )
+    }
+
+    const [atualizada] = await transacao
+      .update(sessao)
+      .set({
+        status: 'em_andamento',
+        etapaAtualId: etapaId,
+        etapaStatus: 'aberta',
+      })
+      .where(eq(sessao.id, sessaoId))
+      .returning()
+
+    return atualizada
+  })
+
+  publicar(sessaoId, 'todos')
+  return aberta
+}
+
+/**
+ * Encerra a etapa aberta. A autoridade é sempre do organizador: mesmo com gente
+ * faltando responder, é ele quem decide que a volta acabou.
+ */
+export async function encerrarEtapa(sessaoId: string) {
+  const [encerrada] = await db
+    .update(sessao)
+    .set({ etapaStatus: 'encerrada' })
+    .where(and(eq(sessao.id, sessaoId), eq(sessao.etapaStatus, 'aberta')))
+    .returning()
+
+  if (!encerrada) {
+    throw new RecusaDeRegra('Não há etapa aberta nesta sessão.', 409)
+  }
+
+  publicar(sessaoId, 'todos')
+  return encerrada
+}
+
+/**
+ * Encerra a etapa sozinha quando todo mundo na sala já respondeu tudo o que ela
+ * tinha. É oportunista: se alguém entrou no meio e ainda deve respostas, a
+ * etapa continua aberta e o organizador encerra na mão.
+ *
+ * Chamada depois de registrar uma resposta. Devolve se chegou a encerrar.
+ */
+export async function encerrarEtapaSeCompleta(
+  sessaoId: string
+): Promise<boolean> {
+  const atual = await buscarSessao(sessaoId)
+  if (!atual?.etapaAtualId || atual.etapaStatus !== 'aberta') return false
+
+  if (!(await etapaEstaCompleta(sessaoId, atual.etapaAtualId))) return false
+
+  await encerrarEtapa(sessaoId)
+  return true
 }
 
 export async function buscarSessao(sessaoId: string) {

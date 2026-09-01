@@ -6,11 +6,7 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { fecharBanco, limparBanco, semearQuiz } from './apoio/banco'
-
-test.afterAll(async () => {
-  await fecharBanco()
-})
+import { limparBanco, semearQuiz } from './apoio/banco'
 
 test('a aplicação sob teste responde sem erro de servidor', async ({
   request,

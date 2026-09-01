@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -78,6 +79,12 @@ export function Sessoes({
             {viva.participantes === 1 ? 'pessoa na grade' : 'pessoas na grade'}{' '}
             · aberta {quando(viva.iniciadaEm)}
           </span>
+          <Link
+            href={`/admin/sessions/${viva.id}`}
+            className={`pixel ${estilos.abrirPainel}`}
+          >
+            ABRIR PAINEL →
+          </Link>
           <BotaoRelevo
             tom="vermelho"
             onClick={() => encerrar(viva.id)}

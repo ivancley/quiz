@@ -250,3 +250,13 @@
   border: 2px solid var(--borda-sutil);
   border-radius: var(--raio-pequeno);
 }
+
+.abrirPainel {
+  font-size: 10px;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.abrirPainel:hover {
+  color: var(--amarelo);
+}

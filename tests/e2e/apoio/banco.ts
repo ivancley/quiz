@@ -42,7 +42,16 @@ export async function limparBanco(): Promise<void> {
   )
 }
 
+let encerrado = false
+
+/**
+ * Fecha o pool ao fim da bateria inteira, não ao fim de cada spec: os arquivos
+ * rodam num worker só e compartilham este módulo, então um `afterAll` por spec
+ * derrubaria a conexão debaixo dos arquivos seguintes.
+ */
 export async function fecharBanco(): Promise<void> {
+  if (encerrado) return
+  encerrado = true
   await pool.end()
 }
 
@@ -122,6 +131,26 @@ export async function semearQuiz(roteiro: Roteiro) {
 
 export async function abrirSessao(quizId: string) {
   const [linha] = await db.insert(sessao).values({ quizId }).returning()
+  return linha
+}
+
+export async function entrarNaSessao(sessaoId: string, nome: string) {
+  const [linha] = await db
+    .insert(participante)
+    .values({ sessaoId, nome })
+    .returning()
+  return linha
+}
+
+export async function responder(
+  participanteId: string,
+  perguntaId: string,
+  escolhida: Letra
+) {
+  const [linha] = await db
+    .insert(resposta)
+    .values({ participanteId, perguntaId, escolhida })
+    .returning()
   return linha
 }
 
