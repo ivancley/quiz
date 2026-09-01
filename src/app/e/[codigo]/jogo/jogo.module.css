@@ -347,3 +347,119 @@
   line-height: 1.4;
   color: var(--texto-terciario);
 }
+
+/* Tela de resultado da etapa */
+
+.fecho {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.cartaoDePontos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  padding: 26px;
+  background: var(--superficie);
+  border: 3px solid var(--amarelo);
+  border-radius: var(--raio-grande);
+  box-shadow: 0 6px 0 var(--amarelo-sombra);
+}
+
+.numeroGrande {
+  font-size: 46px;
+  line-height: 1;
+  color: var(--amarelo);
+}
+
+.dupla {
+  display: flex;
+  gap: 14px;
+}
+
+.cartaoPequeno {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  padding: 18px 10px;
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: 16px;
+}
+
+.emVerde {
+  border-color: var(--verde);
+}
+
+.emVerde .numeroMedio {
+  color: var(--verde);
+}
+
+.numeroMedio {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.suaVolta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--afundado);
+  border: 2px solid var(--borda);
+  border-radius: 16px;
+}
+
+.perguntas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.tituloDaPergunta {
+  /* O enunciado inteiro não cabe na linha, e cortar é melhor do que empurrar
+     os pontos para fora da tela. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ganhou {
+  font-weight: 700;
+  color: var(--verde);
+}
+
+.semPonto {
+  font-weight: 700;
+  color: var(--texto-terciario);
+}
+
+.aguardando {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--superficie);
+  border: 2px dashed var(--azul);
+  border-radius: var(--raio);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--texto-secundario);
+}
+
+.pontoAzul {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--azul);
+  animation: piscar 1.4s steps(1) infinite;
+}

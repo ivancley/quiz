@@ -6,6 +6,7 @@ import type { EstadoDoParticipante } from '@/server/estado'
 
 import { Espera } from './Espera'
 import { Pergunta } from './Pergunta'
+import { Resultado } from './Resultado'
 
 /**
  * O celular da pessoa que está jogando.
@@ -85,6 +86,8 @@ export function Jogo({
           aoResponder={recarregar}
         />
       )
+    case 'resultado-etapa':
+      return <Resultado estado={estado} />
     default:
       return null
   }
