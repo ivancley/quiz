@@ -1,0 +1,169 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.voltar {
+  align-self: flex-start;
+  font-size: 10px;
+  color: var(--texto-terciario);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  color: var(--azul);
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.tituloEmRepouso,
+.tituloEmEdicao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.titulo {
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.codigo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.valorDoCodigo {
+  padding: 8px 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 20px;
+  color: var(--amarelo);
+  letter-spacing: 3px;
+}
+
+.rotulo {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.etapas {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 24px;
+  border-top: 2px solid var(--borda);
+}
+
+.tituloDaSecao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.explicacao {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+}
+
+.vazio {
+  padding: 28px;
+  background: var(--tela);
+  border: 2px dashed var(--borda-sutil);
+  border-radius: var(--raio);
+  color: var(--texto-secundario);
+  font-size: 15px;
+}
+
+.listaDeEtapas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.etapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.posicao {
+  font-size: 18px;
+  color: var(--amarelo);
+}
+
+.nomeDaEtapa {
+  flex: 1;
+  min-width: 200px;
+  font-size: 17px;
+}
+
+.numeros {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.formulario {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entrada {
+  flex: 1;
+  min-width: 260px;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 15px;
+}
+
+.entradaGrande {
+  composes: entrada;
+  min-height: 52px;
+  font-size: 18px;
+}
+
+.entrada:focus,
+.entradaGrande:focus {
+  border-color: var(--azul);
+  outline: none;
+}
+
+.erro {
+  font-size: 14px;
+  color: var(--vermelho);
+}

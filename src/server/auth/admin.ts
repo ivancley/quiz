@@ -8,6 +8,7 @@ import {
   hashDaSenhaDoAdministrador,
   segredoDeAssinatura,
 } from '@/server/ambiente'
+import { RecusaDeRegra } from '@/server/db/erros'
 
 /**
  * Há um administrador só, provisionado por variável de ambiente: não existe
@@ -96,5 +97,17 @@ export async function sessaoDeAdminAtual(): Promise<SessaoDeAdmin | null> {
 export async function exigirAdministrador(): Promise<SessaoDeAdmin> {
   const sessao = await sessaoDeAdminAtual()
   if (!sessao) redirect('/admin/login')
+  return sessao
+}
+
+/**
+ * A mesma guarda para as rotas de escrita, que não podem responder com um
+ * desvio: quem chamou espera JSON, não a tela de login em HTML.
+ */
+export async function exigirAdministradorNaApi(): Promise<SessaoDeAdmin> {
+  const sessao = await sessaoDeAdminAtual()
+  if (!sessao) {
+    throw new RecusaDeRegra('Entre como administrador para continuar.', 401)
+  }
   return sessao
 }

@@ -1,0 +1,131 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.titulo {
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.explicacao {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  max-width: 520px;
+}
+
+.formulario {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rotulo {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.entrada {
+  min-width: 280px;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 15px;
+}
+
+.entrada:focus {
+  border-color: var(--azul);
+  outline: none;
+}
+
+.erro {
+  flex-basis: 100%;
+  font-size: 14px;
+  color: var(--vermelho);
+}
+
+.vazio {
+  padding: 32px;
+  background: var(--tela);
+  border: 2px dashed var(--borda-sutil);
+  border-radius: var(--raio);
+  color: var(--texto-secundario);
+  font-size: 15px;
+}
+
+.grade {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: 0 6px 0 var(--afundado);
+}
+
+.chamada {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.chamada:hover .nome {
+  color: var(--amarelo);
+}
+
+.codigo {
+  align-self: flex-start;
+  padding: 6px 10px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 14px;
+  color: var(--amarelo);
+  letter-spacing: 2px;
+}
+
+.nome {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.numeros {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.excluir {
+  align-self: flex-start;
+  margin-top: auto;
+}
