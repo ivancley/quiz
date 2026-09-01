@@ -28,7 +28,7 @@ pessoas receberem o mesmo bônus, mesmo respondendo no mesmo instante.
 ```bash
 npm install
 cp .env.example .env          # e preencha, ver abaixo
-docker compose up -d db
+docker compose -f docker-compose.dev.yml up -d
 npm run db:migrate
 npm run dev
 ```
@@ -68,11 +68,14 @@ porta 3032 — o `npm run dev` do dia a dia pode continuar aberto.
 ## Implantação
 
 A aplicação vai para a VPS pelo Dokploy, a partir de
-[`docker-compose.producao.yml`](./docker-compose.producao.yml).
+[`docker-compose.yml`](./docker-compose.yml) — o nome que o Dokploy procura por
+padrão, sem precisar configurar caminho. O compose do dia a dia é o
+[`docker-compose.dev.yml`](./docker-compose.dev.yml), que sobe só o Postgres.
 
-```bash
-docker compose -f docker-compose.producao.yml up --build -d
-```
+O Dokploy publica a aplicação pelo Traefik, a partir do domínio configurado na
+aba **Domains**: aponte para o serviço `app`, porta `3000`. O compose não abre
+porta no host de propósito — quem serve é o proxy, com TLS. O Postgres fica só
+na rede interna, fora do alcance dos outros projetos da VPS.
 
 As variáveis a definir no painel do Dokploy:
 

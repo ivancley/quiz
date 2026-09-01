@@ -1,23 +1,73 @@
+# Implantação do Quiz ao Vivo. É este arquivo que o Dokploy consome na VPS,
+# e por isso ele tem o nome que o Dokploy procura por padrão.
+#
+# Para desenvolver, use docker-compose.dev.yml: lá sobe só o Postgres, porque a
+# aplicação roda fora do Docker na máquina de quem desenvolve.
+
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://quiz:${DB_PASSWORD:?defina DB_PASSWORD}@db:5432/quiz
+      APP_BASE_URL: ${APP_BASE_URL:?defina APP_BASE_URL, o endereço que vai no QR Code}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?defina ADMIN_EMAIL}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?defina ADMIN_PASSWORD_HASH}
+      AUTH_SECRET: ${AUTH_SECRET:?defina AUTH_SECRET}
+    # `expose` e não `ports`: quem publica a aplicação é o Traefik do Dokploy,
+    # a partir do domínio configurado no painel. Abrir a porta no host deixaria
+    # a aplicação acessível por fora do proxy, sem TLS e sem as regras dele.
+    expose:
+      - 3000
+    networks:
+      # A rede compartilhada é a que o Traefik enxerga; a interna é por onde a
+      # aplicação fala com o banco.
+      - dokploy-network
+      - interna
+    deploy:
+      # UMA RÉPLICA, OBRIGATÓRIO.
+      #
+      # Quem está ouvindo cada sessão vive na memória do processo. Com duas
+      # réplicas, cada uma conheceria metade da sala: a outra metade continuaria
+      # com a tela parada na pergunta anterior, sem nenhum erro aparecer em lugar
+      # nenhum. É a falha mais difícil de diagnosticar deste sistema, e escalar
+      # horizontalmente é exatamente o que a produz.
+      #
+      # Para escalar de verdade seria preciso trocar o registro em memória por
+      # LISTEN/NOTIFY do Postgres — está isolado atrás de duas funções em
+      # src/server/realtime/hub.ts justamente para que isso seja um arquivo.
+      replicas: 1
+
   db:
     image: postgres:16-alpine
-    container_name: quiz-db
+    restart: unless-stopped
     environment:
       POSTGRES_USER: quiz
-      POSTGRES_PASSWORD: quiz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
       POSTGRES_DB: quiz
-    ports:
-      # Porta padrão do Postgres deslocada em +31 para não colidir com os outros
-      # projetos que rodam em Docker nesta máquina.
-      - '${DB_PORT:-5463}:5432'
     volumes:
-      - quiz-db-data:/var/lib/postgresql/data
-      - ./scripts/criar-banco-de-teste.sh:/docker-entrypoint-initdb.d/criar-banco-de-teste.sh:ro
+      - quiz-dados:/var/lib/postgresql/data
+    # Só na rede interna: o banco não tem por que ser alcançável a partir da
+    # rede que os outros projetos da VPS compartilham.
+    networks:
+      - interna
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U quiz -d quiz']
-      interval: 3s
+      interval: 5s
       timeout: 3s
       retries: 20
 
+networks:
+  # Criada pelo Dokploy quando ele é instalado; é por ela que o Traefik alcança
+  # os contêineres. Declarada como externa porque não é este compose que a cria.
+  dokploy-network:
+    external: true
+  interna:
+
 volumes:
-  quiz-db-data:
+  quiz-dados:
