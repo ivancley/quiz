@@ -12,6 +12,7 @@ import {
   quiz,
   sessao,
 } from '@/server/db/schema'
+import { publicar } from '@/server/realtime/hub'
 
 /**
  * Toda escrita do sistema passa por aqui. As regras que o banco já garante em
@@ -250,6 +251,11 @@ export async function finalizarSessao(sessaoId: string) {
       409
     )
   }
+
+  // A bandeirada muda a tela de todo mundo ao mesmo tempo, e é o único aviso
+  // que ninguém pode perder: quem ficasse sem ele continuaria olhando para uma
+  // pergunta que não aceita mais resposta.
+  publicar(finalizada.id, 'todos')
 
   return finalizada
 }
