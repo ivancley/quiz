@@ -3,22 +3,17 @@ import { Pool } from 'pg'
 
 import * as schema from './schema'
 
-function urlDoBanco(): string {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error(
-      'DATABASE_URL não está definida. Copie .env.example para .env e preencha.'
-    )
-  }
-  return url
-}
-
 // Uma única instância por processo, reaproveitada entre recarregamentos de
 // módulo em desenvolvimento para não abrir um pool novo a cada edição.
 const global_ = globalThis as unknown as { poolDoQuiz?: Pool }
 
+// O pool é montado sem exigir o endereço, e o `pg` só abre conexão na primeira
+// consulta. Isso é o que permite compilar a aplicação sem um banco por perto —
+// o build percorre os módulos de todas as rotas, e um erro aqui derrubaria a
+// construção da imagem. Endereço ausente é conferido quando o servidor sobe,
+// por `verificarAmbiente`, que é onde a falta tem conserto.
 export const pool = (global_.poolDoQuiz ??= new Pool({
-  connectionString: urlDoBanco(),
+  connectionString: process.env.DATABASE_URL,
   max: 10,
 }))
 

@@ -15,6 +15,13 @@ function obrigatoria(nome: string, comoResolver: string): string {
   return valor
 }
 
+export function enderecoDoBanco(): string {
+  return obrigatoria(
+    'DATABASE_URL',
+    'Copie .env.example para .env e preencha, ou defina a variável no contêiner.'
+  )
+}
+
 export function emailDoAdministrador(): string {
   return obrigatoria(
     'ADMIN_EMAIL',
@@ -106,6 +113,7 @@ export function enderecoPublicoBase(): string {
  * produzir uma tela quebrada na primeira requisição.
  */
 export function verificarAmbiente(): void {
+  enderecoDoBanco()
   emailDoAdministrador()
   hashDaSenhaDoAdministrador()
   segredoDeAssinatura()
