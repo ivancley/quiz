@@ -1,5 +1,6 @@
 import {
   devices,
+  expect,
   type Browser,
   type BrowserContext,
   type Page,
@@ -41,4 +42,16 @@ export async function novoCelular(browser: Browser): Promise<Page> {
 /** Desliga os celulares extras do caso; o do fixture `page` fecha sozinho. */
 export async function desligarCelulares(): Promise<void> {
   await Promise.all(abertos.splice(0).map((contexto) => contexto.close()))
+}
+
+/** O percurso da porta de entrada: abrir o endereço do QR, dizer o nome, entrar. */
+export async function entrarNaSala(
+  pagina: Page,
+  codigo: string,
+  nome: string
+): Promise<void> {
+  await pagina.goto(`/e/${codigo}`)
+  await pagina.getByLabel('SEU NOME').fill(nome)
+  await pagina.getByRole('button', { name: 'ENTRAR NA CORRIDA' }).click()
+  await expect(pagina).toHaveURL(new RegExp(`/e/${codigo}/jogo$`))
 }

@@ -17,8 +17,8 @@ import {
   moverPergunta,
   numerosDaProjecao,
   renomearEtapa,
-  sessaoVivaDoQuiz,
 } from '@/server/acoes'
+import { sessaoVivaDoQuiz } from '@/server/estado'
 import { RecusaDeRegra } from '@/server/db/erros'
 
 import { criarParticipante, fecharBanco, limparBanco } from '../helpers/banco'

@@ -1,0 +1,173 @@
+/* Estilos das telas do celular durante a corrida. */
+
+.tela {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 28px 26px 34px;
+  overflow-y: auto;
+}
+
+.centrada {
+  align-items: center;
+  text-align: center;
+}
+
+.rotulo {
+  font-size: 9px;
+  color: var(--texto-terciario);
+}
+
+/* Pílula do estado da conexão */
+
+.sinal {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--afundado);
+  border: 2px solid var(--borda);
+  border-radius: 999px;
+}
+
+.ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: piscar 1.4s steps(1) infinite;
+}
+
+.online .ponto {
+  background: var(--verde);
+}
+
+.offline .ponto {
+  background: var(--amarelo);
+}
+
+.offline {
+  border-color: var(--amarelo-sombra);
+}
+
+/* Semáforo de largada */
+
+.semaforo {
+  display: flex;
+  gap: 14px;
+  padding: 20px 24px;
+  background: var(--afundado);
+  border: 3px solid var(--borda);
+  border-radius: 18px;
+}
+
+.luz {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1e3324;
+  box-shadow: 0 0 0 3px #14211a;
+}
+
+.luzAcesa {
+  background: var(--vermelho);
+  box-shadow: 0 0 0 3px var(--vermelho-fundo);
+}
+
+.chamada {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.titulo {
+  font-size: 16px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+.recado {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  text-wrap: pretty;
+}
+
+/* Cartão do participante */
+
+.cartao {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: 18px;
+}
+
+.piloto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.identificacao {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.nome {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.divisor {
+  height: 2px;
+  background: var(--borda);
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--texto-secundario);
+}
+
+.destaque {
+  font-size: 12px;
+  color: var(--amarelo);
+}
+
+/* Barra listrada de preparação */
+
+.preparando {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trilho {
+  height: 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.listras {
+  height: 100%;
+  width: 62%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--amarelo) 0 12px,
+    var(--amarelo-escuro) 12px 24px
+  );
+  animation: correr 1.1s linear infinite;
+}

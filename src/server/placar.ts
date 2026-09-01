@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
 
 import { db } from '@/server/db/client'
+import type { Letra } from '@/server/db/schema'
 import { BONUS_POR_ORDEM, PONTO_POR_ACERTO } from '@/server/pontuacao'
 
 export type LinhaDoPlacar = {
@@ -90,5 +91,86 @@ export async function placarDaSessao(
     acertos: linha.acertos,
     bonus: linha.bonus,
     total: linha.total,
+  }))
+}
+
+export type PontoDaPergunta = {
+  perguntaId: string
+  posicao: number
+  texto: string
+  /** A letra marcada, ou null enquanto a pessoa ainda não respondeu. */
+  escolhida: Letra | null
+  acertou: boolean
+  pontos: number
+}
+
+/**
+ * A volta de uma pessoa numa etapa: cada pergunta dela, o que essa pessoa
+ * marcou e quanto aquilo valeu.
+ *
+ * Sai da mesma regra do placar, aplicada a uma etapa só — a ordem de acerto
+ * continua sendo contada sobre a sessão inteira, porque é a corrida daquela
+ * pergunta que decide o bônus, não o recorte que a tela está mostrando.
+ *
+ * Perguntas ainda não respondidas vêm com `escolhida` nula e zero ponto. Note
+ * que `acertou` é falso nesse caso: quem lê isto não descobre nada sobre o
+ * gabarito de uma pergunta que ainda não respondeu.
+ */
+export async function voltaDoParticipante(
+  sessaoId: string,
+  participanteId: string,
+  etapaId: string
+): Promise<PontoDaPergunta[]> {
+  const linhas = await db.execute<{
+    pergunta_id: string
+    posicao: number
+    texto: string
+    escolhida: Letra | null
+    acertou: boolean
+    pontos: number
+  }>(sql`
+    with acertos as (
+      select
+        r.pergunta_id,
+        r.participante_id,
+        row_number() over (
+          partition by p.sessao_id, r.pergunta_id
+          order by r.respondida_em, r.id
+        ) as ordem
+      from resposta r
+      join participante p on p.id = r.participante_id
+      join pergunta q on q.id = r.pergunta_id
+      where p.sessao_id = ${sessaoId}
+        and r.escolhida = q.correta
+    )
+    select
+      q.id as pergunta_id,
+      q.posicao,
+      q.texto,
+      minha.escolhida,
+      coalesce(minha.escolhida = q.correta, false) as acertou,
+      (case
+         when minha.escolhida = q.correta
+         then ${PONTO_POR_ACERTO} + (case a.ordem ${BONUS_EM_SQL} else 0 end)
+         else 0
+       end)::int as pontos
+    from pergunta q
+    left join resposta minha
+      on minha.pergunta_id = q.id
+     and minha.participante_id = ${participanteId}
+    left join acertos a
+      on a.pergunta_id = q.id
+     and a.participante_id = ${participanteId}
+    where q.etapa_id = ${etapaId}
+    order by q.posicao
+  `)
+
+  return linhas.rows.map((linha) => ({
+    perguntaId: linha.pergunta_id,
+    posicao: linha.posicao,
+    texto: linha.texto,
+    escolhida: linha.escolhida,
+    acertou: linha.acertou,
+    pontos: linha.pontos,
   }))
 }

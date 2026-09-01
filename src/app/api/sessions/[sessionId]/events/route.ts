@@ -16,7 +16,14 @@ export async function GET(pedido: Request, { params }: Contexto) {
 
   // O painel do organizador recebe também o que só interessa a ele; quem está
   // no celular recebe apenas as mudanças de rumo da dinâmica.
-  const alvo = (await sessaoDeAdminAtual()) ? 'admin' : 'todos'
+  //
+  // Quem se declara participante recebe o conjunto menor mesmo estando no
+  // navegador do organizador — pedir menos nunca precisa de permissão, e sem
+  // isso o celular aberto na máquina de quem conduz recarregaria a cada
+  // resposta da sala.
+  const como = new URL(pedido.url).searchParams.get('como')
+  const alvo =
+    como !== 'participante' && (await sessaoDeAdminAtual()) ? 'admin' : 'todos'
 
   const codificador = new TextEncoder()
 

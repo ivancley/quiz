@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 
-import { listarEtapas, quizPorCodigo, sessaoVivaDoQuiz } from '@/server/acoes'
+import { listarEtapas, quizPorCodigo } from '@/server/acoes'
+import { sessaoVivaDoQuiz } from '@/server/estado'
 import { identidadeAtual } from '@/server/auth/participante'
 
 import { Entrada } from './Entrada'

@@ -12,7 +12,7 @@ import {
   quiz,
   sessao,
 } from '@/server/db/schema'
-import { etapaEstaCompleta } from '@/server/estado'
+import { etapaEstaCompleta, sessaoVivaDoQuiz } from '@/server/estado'
 import { publicar } from '@/server/realtime/hub'
 
 /**
@@ -366,14 +366,6 @@ export async function buscarSessao(sessaoId: string) {
     .from(sessao)
     .where(eq(sessao.id, sessaoId))
   return encontrada ?? null
-}
-
-export async function sessaoVivaDoQuiz(quizId: string) {
-  const [viva] = await db
-    .select()
-    .from(sessao)
-    .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada')))
-  return viva ?? null
 }
 
 /** O histórico do quiz: a sessão viva, se houver, e todas as já realizadas. */
