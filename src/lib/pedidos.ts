@@ -10,11 +10,15 @@ type Metodo = 'POST' | 'PATCH' | 'DELETE'
 
 const FALHA_DE_REDE = 'Não foi possível falar com o servidor.'
 
-export async function enviar(
+export type Retorno<T> =
+  { dados: T; erro: null } | { dados: null; erro: string }
+
+/** Para as chamadas cuja resposta a tela precisa mostrar. */
+export async function enviarEReceber<T>(
   endereco: string,
   metodo: Metodo,
   corpo?: unknown
-): Promise<string | null> {
+): Promise<Retorno<T>> {
   try {
     const resposta = await fetch(endereco, {
       method: metodo,
@@ -22,13 +26,27 @@ export async function enviar(
       body: corpo ? JSON.stringify(corpo) : undefined,
     })
 
-    if (resposta.ok) return null
-
     const conteudo = await resposta.json().catch(() => null)
-    return typeof conteudo?.erro === 'string'
-      ? conteudo.erro
-      : 'A operação não foi concluída.'
+
+    if (resposta.ok) return { dados: conteudo?.dados as T, erro: null }
+
+    return {
+      dados: null,
+      erro:
+        typeof conteudo?.erro === 'string'
+          ? conteudo.erro
+          : 'A operação não foi concluída.',
+    }
   } catch {
-    return FALHA_DE_REDE
+    return { dados: null, erro: FALHA_DE_REDE }
   }
+}
+
+/** Para as chamadas em que só interessa se deu certo. */
+export async function enviar(
+  endereco: string,
+  metodo: Metodo,
+  corpo?: unknown
+): Promise<string | null> {
+  return (await enviarEReceber(endereco, metodo, corpo)).erro
 }

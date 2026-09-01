@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { EstadoDoParticipante } from '@/server/estado'
 
 import { Espera } from './Espera'
+import { Pergunta } from './Pergunta'
 
 /**
  * O celular da pessoa que está jogando.
@@ -73,6 +74,17 @@ export function Jogo({
   switch (estado.tela) {
     case 'espera':
       return <Espera estado={estado} conexao={conexao} />
+    case 'pergunta':
+      return (
+        // A chave é a pergunta: virar a volta zera o que a tela guardava sobre
+        // a resposta anterior, sem precisar limpar campo por campo.
+        <Pergunta
+          key={estado.pergunta.id}
+          codigo={codigo}
+          estado={estado}
+          aoResponder={recarregar}
+        />
+      )
     default:
       return null
   }

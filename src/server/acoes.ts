@@ -1,6 +1,7 @@
 import { and, asc, count, eq, ne, sql } from 'drizzle-orm'
 import { z } from 'zod'
 
+import type { Identidade } from '@/server/auth/participante'
 import { sortearCodigoDeQuiz } from '@/server/codigo'
 import { db } from '@/server/db/client'
 import { RecusaDeRegra, violou } from '@/server/db/erros'
@@ -10,9 +11,12 @@ import {
   participante,
   pergunta,
   quiz,
+  resposta,
   sessao,
+  type Letra,
 } from '@/server/db/schema'
 import { etapaEstaCompleta, sessaoVivaDoQuiz } from '@/server/estado'
+import { somarPontos, voltaDoParticipante } from '@/server/placar'
 import { publicar } from '@/server/realtime/hub'
 
 /**
@@ -356,8 +360,17 @@ export async function encerrarEtapaSeCompleta(
 
   if (!(await etapaEstaCompleta(sessaoId, atual.etapaAtualId))) return false
 
-  await encerrarEtapa(sessaoId)
-  return true
+  try {
+    await encerrarEtapa(sessaoId)
+    return true
+  } catch (erro) {
+    // As duas últimas respostas podem chegar juntas, e as duas concluírem que
+    // a volta acabou. Quem encerra de fato é o UPDATE condicional; para quem
+    // perdeu a corrida a etapa já está fechada, que era o objetivo — e uma
+    // recusa aqui derrubaria uma resposta perfeitamente válida.
+    if (erro instanceof RecusaDeRegra) return false
+    throw erro
+  }
 }
 
 export async function buscarSessao(sessaoId: string) {
@@ -456,6 +469,79 @@ export async function entrarNaCorrida(codigo: string, nome: string) {
       )
     }
     throw erro
+  }
+}
+
+/**
+ * Registra a resposta de uma pessoa a uma pergunta.
+ *
+ * A correção é feita aqui, no servidor, comparando com a coluna do gabarito: o
+ * celular nunca soube qual era a certa, e não é ele quem diz se acertou.
+ *
+ * A resposta é definitiva. Quem garante isso é a unicidade de (participante,
+ * pergunta) no banco — uma conferência antes do insert seria atravessada por
+ * dois toques rápidos no mesmo botão, e o bônus de velocidade viraria
+ * negociável.
+ */
+export async function registrarResposta(
+  identidade: Identidade,
+  perguntaId: string,
+  escolhida: Letra
+) {
+  const [dono] = await db
+    .select()
+    .from(participante)
+    .where(eq(participante.id, identidade.participanteId))
+
+  if (!dono || dono.sessaoId !== identidade.sessaoId) {
+    throw new RecusaDeRegra('Entre na corrida de novo para responder.', 401)
+  }
+
+  const atual = await buscarSessao(dono.sessaoId)
+  if (!atual || atual.status === 'finalizada') {
+    throw new RecusaDeRegra('Esta corrida já recebeu a bandeirada final.', 409)
+  }
+
+  const [alvo] = await db
+    .select()
+    .from(pergunta)
+    .where(eq(pergunta.id, perguntaId))
+
+  if (!alvo) throw new RecusaDeRegra('Pergunta não encontrada.', 404)
+
+  // Responder pergunta de etapa fechada valeria pontos fora da volta em que a
+  // sala inteira estava competindo.
+  if (atual.etapaStatus !== 'aberta' || atual.etapaAtualId !== alvo.etapaId) {
+    throw new RecusaDeRegra('Esta etapa não está aberta para respostas.', 409)
+  }
+
+  try {
+    await db.insert(resposta).values({
+      participanteId: dono.id,
+      perguntaId: alvo.id,
+      escolhida,
+    })
+  } catch (erro) {
+    if (violou(erro, 'resposta_unica_por_pergunta')) {
+      throw new RecusaDeRegra(
+        'Você já respondeu esta pergunta. A resposta é definitiva.',
+        409
+      )
+    }
+    throw erro
+  }
+
+  // Se esta foi a última resposta que faltava, a etapa fecha sozinha e a sala
+  // inteira precisa saber; senão, só o painel tem o que atualizar.
+  if (!(await encerrarEtapaSeCompleta(atual.id))) {
+    publicar(atual.id, 'admin')
+  }
+
+  const volta = await voltaDoParticipante(atual.id, dono.id, alvo.etapaId)
+
+  return {
+    correta: escolhida === alvo.correta,
+    pontosNaEtapa: somarPontos(volta),
   }
 }
 

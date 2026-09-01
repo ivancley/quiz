@@ -134,6 +134,44 @@ export async function abrirSessao(quizId: string) {
   return linha
 }
 
+/**
+ * Abre a etapa mexendo direto no banco.
+ *
+ * Serve aos cenários que só querem a sala num certo estado. Note que isto NÃO
+ * dispara o aviso de tempo real — o canal vive na memória do processo da
+ * aplicação —, então a tela só acompanha depois de um recarregamento. Para
+ * testar a propagação, a etapa precisa ser aberta pela rota do organizador.
+ */
+export async function abrirEtapaNoBanco(sessaoId: string, etapaId: string) {
+  await db
+    .update(sessao)
+    .set({
+      status: 'em_andamento',
+      etapaAtualId: etapaId,
+      etapaStatus: 'aberta',
+    })
+    .where(sql`${sessao.id} = ${sessaoId}`)
+}
+
+export async function encerrarEtapaNoBanco(sessaoId: string) {
+  await db
+    .update(sessao)
+    .set({ etapaStatus: 'encerrada' })
+    .where(sql`${sessao.id} = ${sessaoId}`)
+}
+
+export async function finalizarSessaoNoBanco(sessaoId: string) {
+  await db
+    .update(sessao)
+    .set({
+      status: 'finalizada',
+      finalizadaEm: sql`now()`,
+      etapaAtualId: null,
+      etapaStatus: null,
+    })
+    .where(sql`${sessao.id} = ${sessaoId}`)
+}
+
 export async function entrarNaSessao(sessaoId: string, nome: string) {
   const [linha] = await db
     .insert(participante)

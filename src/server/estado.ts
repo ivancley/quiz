@@ -12,6 +12,7 @@ import {
 } from '@/server/db/schema'
 import {
   placarDaSessao,
+  somarPontos,
   voltaDoParticipante,
   type LinhaDoPlacar,
   type PontoDaPergunta,
@@ -496,10 +497,6 @@ function segmentosDaEtapa(
     }
     return ponto.acertou ? 'acertou' : 'errou'
   })
-}
-
-export function somarPontos(volta: PontoDaPergunta[]): number {
-  return volta.reduce((total, ponto) => total + ponto.pontos, 0)
 }
 
 /**

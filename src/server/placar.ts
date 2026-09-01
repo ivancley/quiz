@@ -174,3 +174,8 @@ export async function voltaDoParticipante(
     pontos: linha.pontos,
   }))
 }
+
+/** O que a volta inteira valeu — os pontos da etapa que a tela mostra. */
+export function somarPontos(volta: PontoDaPergunta[]): number {
+  return volta.reduce((total, ponto) => total + ponto.pontos, 0)
+}
