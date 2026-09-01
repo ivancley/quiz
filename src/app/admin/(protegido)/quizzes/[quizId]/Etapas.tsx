@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 
@@ -112,7 +113,12 @@ export function Etapas({
                 </>
               ) : (
                 <>
-                  <span className={estilos.nomeDaEtapa}>{etapa.titulo}</span>
+                  <Link
+                    href={`/admin/quizzes/${quizId}/stages/${etapa.id}`}
+                    className={estilos.nomeDaEtapa}
+                  >
+                    {etapa.titulo}
+                  </Link>
                   <span className={`pixel ${estilos.numeros}`}>
                     {etapa.perguntas}{' '}
                     {etapa.perguntas === 1 ? 'PERGUNTA' : 'PERGUNTAS'}

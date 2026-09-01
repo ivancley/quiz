@@ -1,0 +1,224 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.voltar {
+  align-self: flex-start;
+  font-size: 10px;
+  color: var(--texto-terciario);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  color: var(--azul);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.posicao {
+  font-size: 10px;
+  color: var(--amarelo);
+}
+
+.titulo {
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.explicacao {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  max-width: 560px;
+}
+
+.perguntas {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.vazio {
+  padding: 28px;
+  background: var(--tela);
+  border: 2px dashed var(--borda-sutil);
+  border-radius: var(--raio);
+  color: var(--texto-secundario);
+  font-size: 15px;
+}
+
+.lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.linhaDoTopo {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.numero {
+  font-size: 16px;
+  color: var(--amarelo);
+}
+
+.enunciadoLido {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.alternativasLidas {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.alternativaLida {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 15px;
+}
+
+.letra {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  background: var(--superficie);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 12px;
+  color: var(--texto-secundario);
+}
+
+/* A alternativa correta é a única informação da tela que precisa saltar: é o
+   que o organizador confere antes de a pergunta ir ao ar. */
+.correta {
+  border-color: var(--verde);
+  background: var(--verde-fundo);
+}
+
+.correta .letra {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--verde-texto);
+}
+
+.selo {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--verde);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adicionar {
+  align-self: flex-start;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rotulo {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.enunciado {
+  padding: 12px 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.alternativas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  border: none;
+}
+
+.alternativa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+}
+
+.marcador {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--verde);
+}
+
+.entrada {
+  flex: 1;
+  min-height: 42px;
+  padding: 0 12px;
+  background: var(--superficie);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+  font-size: 15px;
+}
+
+.enunciado:focus,
+.entrada:focus {
+  border-color: var(--azul);
+  outline: none;
+}
+
+.acoesDoFormulario {
+  display: flex;
+  gap: 10px;
+}
+
+.erro {
+  font-size: 14px;
+  color: var(--vermelho);
+}

@@ -114,6 +114,12 @@
   flex: 1;
   min-width: 200px;
   font-size: 17px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.nomeDaEtapa:hover {
+  color: var(--amarelo);
 }
 
 .numeros {
