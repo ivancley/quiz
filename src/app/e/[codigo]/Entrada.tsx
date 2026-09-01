@@ -1,12 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 
 import { BotaoRelevo } from '@/components/BotaoRelevo'
 import { Moldura } from '@/components/Moldura'
 import { CORES_DE_KART, inicialDoNome } from '@/lib/kart'
 import { enviar } from '@/lib/pedidos'
+import type { ResumoDoQuiz } from '@/server/estado'
 
 import estilos from './entrada.module.css'
 
@@ -17,25 +18,42 @@ import estilos from './entrada.module.css'
  */
 const PREVIA_DO_KART = CORES_DE_KART[0]
 
+/**
+ * De quanto em quanto tempo a tela pergunta se a sala já abriu.
+ *
+ * Aqui não há canal de avisos: ele é assinado por sessão, e a sessão é
+ * justamente o que ainda não existe. Alguns segundos de espera são o preço de
+ * não pedir a ninguém que fique recarregando a página.
+ */
+const INTERVALO_DE_ESPERA = 3000
+
 type Props = {
   codigo: string
-  titulo: string
-  etapas: number
-  perguntas: number
+  quiz: ResumoDoQuiz
   salaAberta: boolean
 }
 
-export function Entrada({
-  codigo,
-  titulo,
-  etapas,
-  perguntas,
-  salaAberta,
-}: Props) {
+export function Entrada({ codigo, quiz, salaAberta }: Props) {
   const router = useRouter()
   const [nome, setNome] = useState('')
   const [erro, setErro] = useState<string | null>(null)
   const [entrando, setEntrando] = useState(false)
+
+  useEffect(() => {
+    if (salaAberta) return
+
+    const relogio = setInterval(async () => {
+      const resposta = await fetch(`/api/e/${codigo}/estado`, {
+        cache: 'no-store',
+      })
+      if (!resposta.ok) return
+
+      const { dados } = await resposta.json()
+      if (dados.tela !== 'sem-sessao') router.refresh()
+    }, INTERVALO_DE_ESPERA)
+
+    return () => clearInterval(relogio)
+  }, [salaAberta, codigo, router])
 
   async function entrar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault()
@@ -62,10 +80,10 @@ export function Entrada({
           <span className={`pixel ${estilos.sobretitulo}`}>
             GRAND PRIX DO CONHECIMENTO
           </span>
-          <h1 className={`pixel ${estilos.titulo}`}>{titulo}</h1>
+          <h1 className={`pixel ${estilos.titulo}`}>{quiz.titulo}</h1>
           <p className={estilos.resumo}>
-            {contar(etapas, 'etapa', 'etapas')} ·{' '}
-            {contar(perguntas, 'pergunta', 'perguntas')}
+            {contar(quiz.etapas, 'etapa', 'etapas')} ·{' '}
+            {contar(quiz.perguntas, 'pergunta', 'perguntas')}
           </p>
         </header>
 

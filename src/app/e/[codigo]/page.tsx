@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation'
 
-import { listarEtapas, quizPorCodigo } from '@/server/acoes'
-import { sessaoVivaDoQuiz } from '@/server/estado'
+import { quizPorCodigo } from '@/server/acoes'
 import { identidadeAtual } from '@/server/auth/participante'
+import { estadoDoParticipante } from '@/server/estado'
 
 import { Entrada } from './Entrada'
 
@@ -18,25 +18,19 @@ export default async function PaginaDeEntrada({ params }: Contexto) {
   const doCodigo = await quizPorCodigo(codigo)
   if (!doCodigo) notFound()
 
-  const [viva, etapas, identidade] = await Promise.all([
-    sessaoVivaDoQuiz(doCodigo.id),
-    listarEtapas(doCodigo.id),
-    identidadeAtual(),
-  ])
+  const estado = await estadoDoParticipante(doCodigo, await identidadeAtual())
 
-  // Quem já está na grade e voltou ao endereço do QR não tem por que dizer o
-  // nome de novo — a pessoa quer o jogo, não o formulário.
-  if (viva && identidade?.sessaoId === viva.id) {
+  // Quem já tem kart não precisa dizer o nome de novo — nem quem está esperando
+  // a largada, nem quem voltou depois da bandeirada para ver o próprio placar.
+  if (estado.tela !== 'entrada' && estado.tela !== 'sem-sessao') {
     redirect(`/e/${codigo}/jogo`)
   }
 
   return (
     <Entrada
       codigo={codigo}
-      titulo={doCodigo.titulo}
-      etapas={etapas.length}
-      perguntas={etapas.reduce((total, etapa) => total + etapa.perguntas, 0)}
-      salaAberta={viva !== null}
+      quiz={estado.quiz}
+      salaAberta={estado.tela === 'entrada'}
     />
   )
 }

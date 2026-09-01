@@ -1,10 +1,12 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import type { EstadoDoParticipante } from '@/server/estado'
 
 import { Espera } from './Espera'
+import { Final } from './Final'
 import { Pergunta } from './Pergunta'
 import { Resultado } from './Resultado'
 
@@ -26,6 +28,7 @@ export function Jogo({
   codigo: string
   inicial: EstadoDoParticipante
 }) {
+  const router = useRouter()
   const [estado, setEstado] = useState(inicial)
   const [conexao, setConexao] = useState<Conexao>('reconectando')
 
@@ -37,6 +40,15 @@ export function Jogo({
     const { dados } = await resposta.json()
     setEstado(dados)
   }, [codigo])
+
+  // A sala pode virar debaixo de quem está com o celular na mão: a turma
+  // anterior encerra e a seguinte abre. Quem perdeu o kart volta para a porta,
+  // que é onde ele consegue pegar outro.
+  const semKart = estado.tela === 'entrada' || estado.tela === 'sem-sessao'
+
+  useEffect(() => {
+    if (semKart) router.replace(`/e/${codigo}`)
+  }, [semKart, codigo, router])
 
   const sessaoId = 'sessaoId' in estado ? estado.sessaoId : null
 
@@ -88,7 +100,11 @@ export function Jogo({
       )
     case 'resultado-etapa':
       return <Resultado estado={estado} />
+    case 'final':
+      return <Final estado={estado} />
     default:
+      // Sem kart nesta sessão: o desvio para a porta de entrada já está a
+      // caminho, e desenhar qualquer coisa aqui seria uma tela de passagem.
       return null
   }
 }
