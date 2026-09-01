@@ -33,6 +33,12 @@ export default async function PaginaDoQuiz({
           <span className={`pixel ${estilos.valorDoCodigo}`}>
             {encontrado.codigo}
           </span>
+          <Link
+            href={`/admin/quizzes/${quizId}/qr`}
+            className={`pixel ${estilos.projetar}`}
+          >
+            PROJETAR QR →
+          </Link>
         </div>
       </header>
 

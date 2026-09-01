@@ -56,6 +56,39 @@ export function segredoDeAssinatura(): Uint8Array {
 }
 
 /**
+ * Endereço público da aplicação, sem barra no final.
+ *
+ * É o que vai embutido no QR Code projetado na parede. Errado aqui, o código
+ * impresso aponta para um endereço inacessível e a sala inteira fica de fora —
+ * um erro que só aparece no pior momento possível, com todo mundo já sentado.
+ */
+export function enderecoPublicoBase(): string {
+  const valor = obrigatoria(
+    'APP_BASE_URL',
+    'É o endereço por onde os participantes chegam, ex.: https://quiz.seudominio.com.br.'
+  )
+
+  let endereco: URL
+  try {
+    endereco = new URL(valor)
+  } catch {
+    throw new Error(
+      `APP_BASE_URL não é um endereço válido: ${valor}. Inclua o protocolo, ex.: https://quiz.seudominio.com.br.`
+    )
+  }
+
+  if (endereco.protocol !== 'http:' && endereco.protocol !== 'https:') {
+    throw new Error(
+      `APP_BASE_URL precisa começar com http:// ou https://, e não com ${endereco.protocol}`
+    )
+  }
+
+  // Sem a barra final, para que compor o caminho de entrada nunca produza `//`.
+  const caminho = endereco.pathname === '/' ? '' : endereco.pathname
+  return endereco.origin + caminho
+}
+
+/**
  * Chamada uma vez, quando o servidor sobe. Toca em todas as variáveis para que
  * uma configuração incompleta derrube o processo na largada, em vez de
  * produzir uma tela quebrada na primeira requisição.
@@ -64,4 +97,5 @@ export function verificarAmbiente(): void {
   emailDoAdministrador()
   hashDaSenhaDoAdministrador()
   segredoDeAssinatura()
+  enderecoPublicoBase()
 }

@@ -58,6 +58,16 @@
   color: var(--texto-terciario);
 }
 
+.projetar {
+  font-size: 10px;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.projetar:hover {
+  color: var(--amarelo);
+}
+
 .etapas {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,166 @@
+/*
+ * Tela de parede: lida de longe, por uma sala inteira. Tudo aqui é maior do que
+ * pareceria certo num monitor — a régua é a última fileira, não o teclado.
+ */
+.tela {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px clamp(24px, 5vw, 72px) 24px;
+  background: var(--canvas);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid var(--borda);
+}
+
+/* A bandeira quadriculada de largada, desenhada com dois gradientes cruzados. */
+.bandeira {
+  flex: none;
+  width: 56px;
+  height: 32px;
+  border: 2px solid var(--borda-sutil);
+  border-radius: 4px;
+  background-color: var(--texto);
+  background-image:
+    linear-gradient(45deg, var(--canvas) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--canvas) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--canvas) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--canvas) 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+}
+
+.nomeDoQuiz {
+  flex: 1;
+  font-size: clamp(16px, 2vw, 26px);
+  line-height: 1.4;
+}
+
+.situacao {
+  font-size: clamp(10px, 1.1vw, 14px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+}
+
+.aberta {
+  color: var(--verde);
+}
+
+.fechada {
+  color: var(--texto-terciario);
+}
+
+.corpo {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+}
+
+.instrucao {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.chamada {
+  font-size: clamp(18px, 2.6vw, 34px);
+  line-height: 1.4;
+  color: var(--amarelo);
+}
+
+.endereco {
+  font-size: clamp(20px, 2.8vw, 40px);
+  line-height: 1.3;
+  word-break: break-all;
+}
+
+.alternativa {
+  font-size: clamp(14px, 1.4vw, 20px);
+  line-height: 1.5;
+  color: var(--texto-secundario);
+}
+
+.alternativa strong {
+  color: var(--amarelo);
+  letter-spacing: 2px;
+}
+
+.numeros {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.numero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  min-width: 130px;
+  padding: 18px 22px;
+  background: var(--tela);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: 0 6px 0 var(--afundado);
+}
+
+.valor {
+  font-size: clamp(28px, 3.4vw, 46px);
+  color: var(--amarelo);
+}
+
+.rotulo {
+  font-size: clamp(9px, 0.9vw, 12px);
+  color: var(--texto-terciario);
+}
+
+/* O QR precisa de fundo claro e margem branca: contraste é o que o leitor lê. */
+.moldura {
+  padding: clamp(16px, 2vw, 28px);
+  background: #ffffff;
+  border: 4px solid var(--texto);
+  border-radius: var(--raio-grande);
+  box-shadow: 0 10px 0 var(--afundado);
+}
+
+.codigo {
+  width: clamp(260px, 34vw, 460px);
+}
+
+.codigo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rodape {
+  display: flex;
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 2px solid var(--borda);
+}
+
+.link {
+  font-size: 15px;
+  color: var(--texto-terciario);
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--azul);
+}

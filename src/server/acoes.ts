@@ -1,10 +1,17 @@
-import { asc, count, eq, sql } from 'drizzle-orm'
+import { and, asc, count, eq, ne, sql } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { sortearCodigoDeQuiz } from '@/server/codigo'
 import { db } from '@/server/db/client'
 import { RecusaDeRegra, violou } from '@/server/db/erros'
-import { etapa, LETRAS, pergunta, quiz } from '@/server/db/schema'
+import {
+  etapa,
+  LETRAS,
+  participante,
+  pergunta,
+  quiz,
+  sessao,
+} from '@/server/db/schema'
 
 /**
  * Toda escrita do sistema passa por aqui. As regras que o banco já garante em
@@ -120,6 +127,34 @@ export async function listarEtapas(quizId: string) {
     .where(eq(etapa.quizId, quizId))
     .groupBy(etapa.id)
     .orderBy(asc(etapa.posicao))
+}
+
+/**
+ * Os três números que a tela de projeção mostra ao lado do QR, e se já existe
+ * sala aberta. Quem está chegando quer saber quanta gente já entrou e o tamanho
+ * do que vem pela frente.
+ */
+export async function numerosDaProjecao(quizId: string) {
+  const [porEtapa, [viva]] = await Promise.all([
+    listarEtapas(quizId),
+    db
+      .select({
+        id: sessao.id,
+        naGrade: sql<number>`(
+          select count(*)::int from ${participante}
+          where ${participante.sessaoId} = ${sessao.id}
+        )`,
+      })
+      .from(sessao)
+      .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada'))),
+  ])
+
+  return {
+    etapas: porEtapa.length,
+    perguntas: porEtapa.reduce((total, etapa) => total + etapa.perguntas, 0),
+    naGrade: viva?.naGrade ?? 0,
+    salaAberta: Boolean(viva),
+  }
 }
 
 export async function buscarEtapa(etapaId: string) {
