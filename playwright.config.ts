@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 import { config } from 'dotenv'
 
+import { CELULAR } from './tests/e2e/apoio/celular'
+
 config({ path: '.env.e2e', quiet: true })
 
 const porta = process.env.APP_PORT ?? '3032'
@@ -61,7 +63,7 @@ export default defineConfig({
       // A tela do participante é desenhada para celular em retrato;
       // validar os fluxos móveis num viewport de desktop testaria outra coisa.
       name: 'celular',
-      use: { ...devices['Pixel 7'] },
+      use: { ...CELULAR },
       testMatch: '**/participante/*.spec.ts',
       dependencies: ['preparar'],
     },

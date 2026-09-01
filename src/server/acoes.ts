@@ -393,6 +393,80 @@ export async function listarSessoes(quizId: string) {
     .orderBy(sql`${sessao.iniciadaEm} desc`)
 }
 
+/**
+ * O código do endereço de entrada é lido de um telão e, quando o QR falha,
+ * digitado à mão. A comparação ignora a caixa porque quem digita `7xk29q` está
+ * apontando para o mesmo quiz de quem digita `7XK29Q` — o alfabeto do sorteio
+ * é só maiúsculo, então não existe par de códigos que a caixa distinga.
+ */
+export async function quizPorCodigo(codigo: string) {
+  const [encontrado] = await db
+    .select()
+    .from(quiz)
+    .where(sql`upper(${quiz.codigo}) = upper(${codigo})`)
+  return encontrado ?? null
+}
+
+/** Nomes maiores que isto quebrariam a raia projetada na parede. */
+const LIMITE_DO_NOME = 40
+
+/**
+ * Entrada do participante na sala.
+ *
+ * Não há cadastro: o nome é a identidade toda, e ele precisa ser único na
+ * sessão porque é por ele que a sala reconhece cada kart no placar projetado.
+ * Quem garante a unicidade é o índice do banco, e não uma consulta antes do
+ * insert — duas pessoas digitando o mesmo nome ao mesmo tempo atravessariam a
+ * consulta e chegariam as duas ao banco.
+ */
+export async function entrarNaCorrida(codigo: string, nome: string) {
+  const nomeLimpo = nome.trim().replace(/\s+/g, ' ')
+
+  if (!nomeLimpo) {
+    throw new RecusaDeRegra('Escreva seu nome para entrar na corrida.', 400)
+  }
+  if (nomeLimpo.length > LIMITE_DO_NOME) {
+    throw new RecusaDeRegra(
+      `Use um nome de até ${LIMITE_DO_NOME} caracteres.`,
+      400
+    )
+  }
+
+  const doCodigo = await quizPorCodigo(codigo)
+  if (!doCodigo) {
+    throw new RecusaDeRegra('Este endereço não leva a nenhum quiz.', 404)
+  }
+
+  const viva = await sessaoVivaDoQuiz(doCodigo.id)
+  if (!viva) {
+    throw new RecusaDeRegra(
+      'A sala ainda não foi aberta. Espere o organizador começar.',
+      409
+    )
+  }
+
+  try {
+    const [entrou] = await db
+      .insert(participante)
+      .values({ sessaoId: viva.id, nome: nomeLimpo })
+      .returning()
+
+    // Só o painel precisa saber que alguém entrou; avisar a sala inteira faria
+    // cinquenta celulares recarregarem o estado a cada chegada.
+    publicar(viva.id, 'admin')
+
+    return { participante: entrou, sessao: viva }
+  } catch (erro) {
+    if (violou(erro, 'participante_nome_unico')) {
+      throw new RecusaDeRegra(
+        'Esse nome já está na pista. Escolha outro para a sala não confundir.',
+        409
+      )
+    }
+    throw erro
+  }
+}
+
 export async function buscarEtapa(etapaId: string) {
   const [encontrada] = await db
     .select()
