@@ -13,7 +13,6 @@ test-results/
 playwright-report/
 next-env.d.ts
 *.tsbuildinfo
-.claude/.cc-writes/
 
-.claude/.playwright-mcp/
-.next-e2e/
+# Ferramental de trabalho local: não faz parte do que a aplicação é.
+.claude/
