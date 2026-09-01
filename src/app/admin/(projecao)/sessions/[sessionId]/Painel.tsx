@@ -243,6 +243,15 @@ export function Painel({
             </p>
           </section>
 
+          {finalizada ? (
+            <Link
+              href={`/admin/sessions/${sessaoId}/final`}
+              className={estilos.link}
+            >
+              Ver o placar final →
+            </Link>
+          ) : null}
+
           <Link
             href={`/admin/quizzes/${estado.quiz.id}`}
             className={estilos.link}

@@ -119,6 +119,12 @@ export function Sessoes({
                     ? 'participante'
                     : 'participantes'}
                 </span>
+                <Link
+                  href={`/admin/sessions/${sessao.id}/final`}
+                  className={`pixel ${estilos.abrirPainel}`}
+                >
+                  VER PLACAR →
+                </Link>
               </li>
             ))}
         </ul>

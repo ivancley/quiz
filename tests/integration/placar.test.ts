@@ -203,6 +203,64 @@ describe('isolamento entre sessões', () => {
   })
 })
 
+describe('placar de uma sessão encerrada', () => {
+  it('continua consultável depois da bandeirada', async () => {
+    const { perguntas, sessao } = await salaComPerguntas(1)
+    const [marina, rafael] = await entrarem(sessao.id, ['Marina', 'Rafael'])
+    await criarResposta(marina.id, perguntas[0].id, 'B')
+    await criarResposta(rafael.id, perguntas[0].id, 'B')
+
+    const antes = await placarDaSessao(sessao.id)
+    await finalizarSessao(sessao.id)
+
+    expect(await placarDaSessao(sessao.id)).toEqual(antes)
+  })
+
+  it('não muda quando o quiz roda de novo com outra turma', async () => {
+    const { quiz, perguntas, sessao } = await salaComPerguntas(1)
+    const [marina] = await entrarem(sessao.id, ['Marina'])
+    await criarResposta(marina.id, perguntas[0].id, 'B')
+
+    const daManha = await placarDaSessao(sessao.id)
+    await finalizarSessao(sessao.id)
+
+    // A turma da tarde joga o mesmo quiz, nas mesmas perguntas.
+    const tarde = await criarSessao(quiz.id)
+    const [rafael] = await entrarem(tarde.id, ['Rafael'])
+    await criarResposta(rafael.id, perguntas[0].id, 'B')
+
+    // O placar da manhã é história: ninguém entra nele depois de encerrado.
+    expect(await placarDaSessao(sessao.id)).toEqual(daManha)
+    expect(resumo(await placarDaSessao(sessao.id))).toEqual([['Marina', 4]])
+  })
+
+  it('guarda acertos, bônus e total de cada um para a tabela final', async () => {
+    const { perguntas, sessao } = await salaComPerguntas(2)
+    const [marina, rafael] = await entrarem(sessao.id, ['Marina', 'Rafael'])
+    await criarResposta(marina.id, perguntas[0].id, 'B')
+    await criarResposta(rafael.id, perguntas[0].id, 'B')
+    await criarResposta(marina.id, perguntas[1].id, 'A')
+    await finalizarSessao(sessao.id)
+
+    const placar = await placarDaSessao(sessao.id)
+
+    expect(placar[0]).toMatchObject({
+      nome: 'Marina',
+      posicao: 1,
+      acertos: 1,
+      bonus: 3,
+      total: 4,
+    })
+    expect(placar[1]).toMatchObject({
+      nome: 'Rafael',
+      posicao: 2,
+      acertos: 1,
+      bonus: 2,
+      total: 3,
+    })
+  })
+})
+
 describe('vinte respostas certas ao mesmo tempo', () => {
   it('distribui um bônus de 3, um de 2, um de 1 e nada para os demais', async () => {
     const { perguntas, sessao } = await salaComPerguntas(1)
