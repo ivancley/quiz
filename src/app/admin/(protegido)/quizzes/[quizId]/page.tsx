@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { buscarQuiz, listarEtapas } from '@/server/acoes'
+import { buscarQuiz, listarEtapas, listarSessoes } from '@/server/acoes'
 
 import { Etapas } from './Etapas'
+import { Sessoes } from './Sessoes'
 import { TituloDoQuiz } from './TituloDoQuiz'
 import estilos from './quiz.module.css'
 
@@ -18,7 +19,13 @@ export default async function PaginaDoQuiz({
   const encontrado = await buscarQuiz(quizId)
   if (!encontrado) notFound()
 
-  const etapas = await listarEtapas(quizId)
+  const [etapas, sessoes] = await Promise.all([
+    listarEtapas(quizId),
+    listarSessoes(quizId),
+  ])
+  // Com uma sessão no ar, o conteúdo do quiz está congelado: mexer nele mudaria
+  // o critério de correção de respostas já registradas.
+  const rodando = sessoes.some((sessao) => sessao.status !== 'finalizada')
 
   return (
     <section className={estilos.pagina}>
@@ -42,7 +49,9 @@ export default async function PaginaDoQuiz({
         </div>
       </header>
 
-      <Etapas quizId={quizId} etapas={etapas} />
+      <Sessoes quizId={quizId} sessoes={sessoes} />
+
+      <Etapas quizId={quizId} etapas={etapas} congelado={rodando} />
     </section>
   )
 }

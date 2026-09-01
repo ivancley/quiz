@@ -183,3 +183,70 @@
   font-size: 14px;
   color: var(--vermelho);
 }
+
+.congelado {
+  padding: 12px 14px;
+  background: var(--vermelho-fundo);
+  border: 2px solid var(--vermelho);
+  border-radius: var(--raio-pequeno);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.sessoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 2px solid var(--borda);
+}
+
+.sessaoViva {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--tela);
+  border: 3px solid var(--verde);
+  border-radius: var(--raio);
+}
+
+.aoVivo {
+  font-size: 11px;
+  color: var(--verde);
+}
+
+.encerrada {
+  font-size: 10px;
+  color: var(--texto-terciario);
+}
+
+.detalhe {
+  flex: 1;
+  min-width: 200px;
+  font-size: 14px;
+  color: var(--texto-secundario);
+}
+
+.abrirSessao {
+  align-self: flex-start;
+}
+
+.historico {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sessaoAntiga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--afundado);
+  border: 2px solid var(--borda-sutil);
+  border-radius: var(--raio-pequeno);
+}

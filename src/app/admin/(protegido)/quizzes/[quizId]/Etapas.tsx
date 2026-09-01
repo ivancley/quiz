@@ -19,9 +19,12 @@ type Etapa = {
 export function Etapas({
   quizId,
   etapas,
+  congelado,
 }: {
   quizId: string
   etapas: Etapa[]
+  /** Há sessão no ar: o servidor recusa qualquer escrita aqui. */
+  congelado: boolean
 }) {
   const router = useRouter()
   const [nova, setNova] = useState('')
@@ -29,6 +32,10 @@ export function Etapas({
   const [rascunho, setRascunho] = useState('')
   const [erro, setErro] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
+
+  // As ações continuam recusadas no servidor; desabilitar aqui é só para o
+  // organizador não descobrir isso clicando.
+  const travado = ocupado || congelado
 
   async function executar(acao: () => Promise<string | null>) {
     setOcupado(true)
@@ -77,6 +84,12 @@ export function Etapas({
         <p className={estilos.explicacao}>
           A dinâmica corre nesta ordem: uma etapa por vez, do topo para baixo.
         </p>
+        {congelado ? (
+          <p className={estilos.congelado}>
+            O conteúdo está congelado enquanto a sessão está no ar. Encerre a
+            sessão para voltar a editar.
+          </p>
+        ) : null}
       </div>
 
       {etapas.length === 0 ? (
@@ -103,7 +116,7 @@ export function Etapas({
                   <BotaoRelevo
                     tom="verde"
                     onClick={() => renomear(etapa.id)}
-                    disabled={ocupado}
+                    disabled={travado}
                   >
                     SALVAR
                   </BotaoRelevo>
@@ -127,7 +140,7 @@ export function Etapas({
                     <BotaoRelevo
                       tom="neutro"
                       onClick={() => mover(etapa.id, 'cima')}
-                      disabled={ocupado || indice === 0}
+                      disabled={travado || indice === 0}
                       aria-label={`Subir a etapa ${etapa.titulo}`}
                     >
                       ↑
@@ -135,7 +148,7 @@ export function Etapas({
                     <BotaoRelevo
                       tom="neutro"
                       onClick={() => mover(etapa.id, 'baixo')}
-                      disabled={ocupado || indice === etapas.length - 1}
+                      disabled={travado || indice === etapas.length - 1}
                       aria-label={`Descer a etapa ${etapa.titulo}`}
                     >
                       ↓
@@ -146,13 +159,14 @@ export function Etapas({
                         setRascunho(etapa.titulo)
                         setEmEdicao(etapa.id)
                       }}
+                      disabled={congelado}
                     >
                       RENOMEAR
                     </BotaoRelevo>
                     <BotaoRelevo
                       tom="neutro"
                       onClick={() => excluir(etapa)}
-                      disabled={ocupado}
+                      disabled={travado}
                     >
                       EXCLUIR
                     </BotaoRelevo>
@@ -173,10 +187,11 @@ export function Etapas({
             onChange={(e) => setNova(e.target.value)}
             placeholder="Título da etapa"
             maxLength={200}
+            disabled={congelado}
             required
           />
         </label>
-        <BotaoRelevo type="submit" tom="verde" disabled={ocupado}>
+        <BotaoRelevo type="submit" tom="verde" disabled={travado}>
           ADICIONAR
         </BotaoRelevo>
       </form>

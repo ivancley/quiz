@@ -21,6 +21,50 @@ import {
 
 const TENTATIVAS_DE_CODIGO = 5
 
+/** Qualquer executor de consulta: o banco direto ou uma transação em curso. */
+type Executor = typeof db | Transacao
+
+/**
+ * Recusa mexer no conteúdo de um quiz que está rodando.
+ *
+ * Trocar o gabarito de uma pergunta no meio de uma sessão passaria a corrigir
+ * por outro critério respostas que já foram registradas — o placar projetado
+ * mudaria sozinho, sem que ninguém tivesse respondido nada. Excluir uma etapa
+ * faria o mesmo, de forma mais silenciosa ainda.
+ */
+async function exigirQuizParado(executor: Executor, quizId: string) {
+  const [viva] = await executor
+    .select({ id: sessao.id })
+    .from(sessao)
+    .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada')))
+
+  if (viva) {
+    throw new RecusaDeRegra(
+      'Este quiz tem uma sessão em andamento. Encerre a sessão para poder editar.',
+      409
+    )
+  }
+}
+
+/** O quiz a que a etapa pertence, para checar a mesma regra a partir dela. */
+async function quizDaEtapa(executor: Executor, etapaId: string) {
+  const [linha] = await executor
+    .select({ quizId: etapa.quizId })
+    .from(etapa)
+    .where(eq(etapa.id, etapaId))
+  return linha?.quizId ?? null
+}
+
+/** O quiz a que a pergunta pertence, dois saltos acima dela. */
+async function quizDaPergunta(executor: Executor, perguntaId: string) {
+  const [linha] = await executor
+    .select({ quizId: etapa.quizId })
+    .from(pergunta)
+    .innerJoin(etapa, eq(etapa.id, pergunta.etapaId))
+    .where(eq(pergunta.id, perguntaId))
+  return linha?.quizId ?? null
+}
+
 export async function criarQuiz(titulo: string) {
   const nome = titulo.trim()
   if (!nome) throw new RecusaDeRegra('O quiz precisa de um título.', 400)
@@ -61,6 +105,8 @@ export async function renomearQuiz(quizId: string, titulo: string) {
 }
 
 export async function excluirQuiz(quizId: string) {
+  await exigirQuizParado(db, quizId)
+
   const [excluido] = await db
     .delete(quiz)
     .where(eq(quiz.id, quizId))
@@ -157,6 +203,90 @@ export async function numerosDaProjecao(quizId: string) {
   }
 }
 
+/**
+ * Uma sessão é uma execução do quiz com uma turma. O molde fica no quiz; o que
+ * aconteceu — quem entrou, quem respondeu o quê — fica na sessão, e é por isso
+ * que rodar a mesma dinâmica com outra turma não exige duplicar o conteúdo.
+ */
+export async function iniciarSessao(quizId: string) {
+  const existe = await buscarQuiz(quizId)
+  if (!existe) throw new RecusaDeRegra('Quiz não encontrado.', 404)
+
+  try {
+    const [criada] = await db.insert(sessao).values({ quizId }).returning()
+    return criada
+  } catch (erro) {
+    // Um quiz roda com uma turma por vez, e quem garante isso é o índice
+    // parcial do banco — não uma checagem antes do insert, que duas abas
+    // clicando junto atravessariam.
+    if (violou(erro, 'sessao_ativa_unica')) {
+      throw new RecusaDeRegra(
+        'Este quiz já tem uma sessão em andamento. Encerre a atual para abrir a próxima.',
+        409
+      )
+    }
+    throw erro
+  }
+}
+
+export async function finalizarSessao(sessaoId: string) {
+  const [finalizada] = await db
+    .update(sessao)
+    .set({
+      status: 'finalizada',
+      finalizadaEm: sql`now()`,
+      // A etapa aberta morre junto com a sessão: deixá-la marcada como aberta
+      // faria um celular reconectado continuar mostrando a pergunta.
+      etapaAtualId: null,
+      etapaStatus: null,
+    })
+    .where(and(eq(sessao.id, sessaoId), ne(sessao.status, 'finalizada')))
+    .returning()
+
+  if (!finalizada) {
+    throw new RecusaDeRegra(
+      'Sessão não encontrada ou já encerrada.',
+      // Encerrar uma sessão já encerrada não é erro de quem clicou duas vezes.
+      409
+    )
+  }
+
+  return finalizada
+}
+
+export async function buscarSessao(sessaoId: string) {
+  const [encontrada] = await db
+    .select()
+    .from(sessao)
+    .where(eq(sessao.id, sessaoId))
+  return encontrada ?? null
+}
+
+export async function sessaoVivaDoQuiz(quizId: string) {
+  const [viva] = await db
+    .select()
+    .from(sessao)
+    .where(and(eq(sessao.quizId, quizId), ne(sessao.status, 'finalizada')))
+  return viva ?? null
+}
+
+/** O histórico do quiz: a sessão viva, se houver, e todas as já realizadas. */
+export async function listarSessoes(quizId: string) {
+  return db
+    .select({
+      id: sessao.id,
+      status: sessao.status,
+      iniciadaEm: sessao.iniciadaEm,
+      finalizadaEm: sessao.finalizadaEm,
+      participantes: count(participante.id),
+    })
+    .from(sessao)
+    .leftJoin(participante, eq(participante.sessaoId, sessao.id))
+    .where(eq(sessao.quizId, quizId))
+    .groupBy(sessao.id)
+    .orderBy(sql`${sessao.iniciadaEm} desc`)
+}
+
 export async function buscarEtapa(etapaId: string) {
   const [encontrada] = await db
     .select()
@@ -170,6 +300,8 @@ export async function criarEtapa(quizId: string, titulo: string) {
   if (!nome) throw new RecusaDeRegra('A etapa precisa de um título.', 400)
 
   return db.transaction(async (transacao) => {
+    await exigirQuizParado(transacao, quizId)
+
     const [{ maior }] = await transacao
       .select({ maior: sql<number>`coalesce(max(${etapa.posicao}), 0)::int` })
       .from(etapa)
@@ -188,6 +320,10 @@ export async function renomearEtapa(etapaId: string, titulo: string) {
   const nome = titulo.trim()
   if (!nome) throw new RecusaDeRegra('A etapa precisa de um título.', 400)
 
+  const quizId = await quizDaEtapa(db, etapaId)
+  if (!quizId) throw new RecusaDeRegra('Etapa não encontrada.', 404)
+  await exigirQuizParado(db, quizId)
+
   const [alterada] = await db
     .update(etapa)
     .set({ titulo: nome })
@@ -200,6 +336,10 @@ export async function renomearEtapa(etapaId: string, titulo: string) {
 
 export async function excluirEtapa(etapaId: string) {
   return db.transaction(async (transacao) => {
+    const quizId = await quizDaEtapa(transacao, etapaId)
+    if (!quizId) throw new RecusaDeRegra('Etapa não encontrada.', 404)
+    await exigirQuizParado(transacao, quizId)
+
     const [excluida] = await transacao
       .delete(etapa)
       .where(eq(etapa.id, etapaId))
@@ -225,6 +365,7 @@ export async function moverEtapa(etapaId: string, direcao: Direcao) {
       .where(eq(etapa.id, etapaId))
 
     if (!alvo) throw new RecusaDeRegra('Etapa não encontrada.', 404)
+    await exigirQuizParado(transacao, alvo.quizId)
 
     const irmas = await transacao
       .select({ id: etapa.id })
@@ -294,6 +435,10 @@ export async function criarPergunta(etapaId: string, dados: unknown) {
   const valida = validarPergunta(dados)
 
   return db.transaction(async (transacao) => {
+    const quizId = await quizDaEtapa(transacao, etapaId)
+    if (!quizId) throw new RecusaDeRegra('Etapa não encontrada.', 404)
+    await exigirQuizParado(transacao, quizId)
+
     const [{ maior }] = await transacao
       .select({
         maior: sql<number>`coalesce(max(${pergunta.posicao}), 0)::int`,
@@ -313,6 +458,10 @@ export async function criarPergunta(etapaId: string, dados: unknown) {
 export async function alterarPergunta(perguntaId: string, dados: unknown) {
   const valida = validarPergunta(dados)
 
+  const quizId = await quizDaPergunta(db, perguntaId)
+  if (!quizId) throw new RecusaDeRegra('Pergunta não encontrada.', 404)
+  await exigirQuizParado(db, quizId)
+
   const [alterada] = await db
     .update(pergunta)
     .set(valida)
@@ -325,6 +474,10 @@ export async function alterarPergunta(perguntaId: string, dados: unknown) {
 
 export async function excluirPergunta(perguntaId: string) {
   return db.transaction(async (transacao) => {
+    const quizId = await quizDaPergunta(transacao, perguntaId)
+    if (!quizId) throw new RecusaDeRegra('Pergunta não encontrada.', 404)
+    await exigirQuizParado(transacao, quizId)
+
     const [excluida] = await transacao
       .delete(pergunta)
       .where(eq(pergunta.id, perguntaId))
@@ -346,6 +499,9 @@ export async function moverPergunta(perguntaId: string, direcao: Direcao) {
       .where(eq(pergunta.id, perguntaId))
 
     if (!alvo) throw new RecusaDeRegra('Pergunta não encontrada.', 404)
+
+    const quizId = await quizDaEtapa(transacao, alvo.etapaId)
+    if (quizId) await exigirQuizParado(transacao, quizId)
 
     const irmas = await transacao
       .select({ id: pergunta.id })
