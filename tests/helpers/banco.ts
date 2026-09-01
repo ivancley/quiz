@@ -83,11 +83,18 @@ export async function criarParticipante(sessaoId: string, nome: string) {
 export async function criarResposta(
   participanteId: string,
   perguntaId: string,
-  escolhida: 'A' | 'B' | 'C' | 'D'
+  escolhida: 'A' | 'B' | 'C' | 'D',
+  /** Force o instante para reproduzir empates que o relógio raramente produz. */
+  respondidaEm?: Date
 ) {
   const [linha] = await db
     .insert(resposta)
-    .values({ participanteId, perguntaId, escolhida })
+    .values({
+      participanteId,
+      perguntaId,
+      escolhida,
+      ...(respondidaEm ? { respondidaEm } : {}),
+    })
     .returning()
   return linha
 }
