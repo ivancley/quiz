@@ -6,6 +6,7 @@ import {
   abrirSessao,
   finalizarSessaoNoBanco,
   limparBanco,
+  participantesDaSessao,
   semearQuiz,
 } from '../apoio/banco'
 import { desligarCelulares, entrarNaSala, novoCelular } from '../apoio/celular'
@@ -37,21 +38,51 @@ async function quizDeDuasEtapas() {
   })
 }
 
-test('escanear antes da sala abrir avisa, e a tela de nome chega sozinha', async ({
+test('escanear antes da sala abrir já pede o nome, e a entrada acontece sozinha', async ({
   page,
 }) => {
   const quiz = await quizDeDuasEtapas()
 
   await page.goto(`/e/${quiz.codigo}`)
 
+  // Escanear o cartaz é o primeiro gesto de quem chega, e ele quase sempre
+  // acontece antes de o organizador abrir a sessão: o campo do nome está lá.
   await expect(page.getByText('SALA AINDA FECHADA')).toBeVisible()
-  await expect(page.getByLabel('SEU NOME')).toHaveCount(0)
+  await expect(page.getByLabel('SEU NOME')).toBeVisible()
 
-  // O organizador abre a sessão com a sala já cheia de gente esperando.
+  await page.getByLabel('SEU NOME').fill('Marina')
+  await page.getByRole('button', { name: 'GUARDAR MEU LUGAR' }).click()
+  await expect(page.getByText('LUGAR GUARDADO')).toBeVisible()
+
+  // O organizador abre a sessão com a sala já cheia de gente esperando, e
+  // ninguém precisa tocar no celular de novo para largar.
+  const sessao = await abrirSessao(quiz.id)
+
+  await expect(page).toHaveURL(new RegExp(`/e/${quiz.codigo}/jogo$`))
+
+  const naGrade = await participantesDaSessao(sessao.id)
+  expect(naGrade.map((pessoa) => pessoa.nome)).toEqual(['Marina'])
+})
+
+test('quem digitou o nome sem confirmar recebe o formulário valendo', async ({
+  page,
+}) => {
+  const quiz = await quizDeDuasEtapas()
+
+  await page.goto(`/e/${quiz.codigo}`)
+  await page.getByLabel('SEU NOME').fill('Rafael')
+
   await abrirSessao(quiz.id)
 
-  await expect(page.getByLabel('SEU NOME')).toBeVisible()
+  // A tela troca sozinha sem cobrar que ele digite o nome de novo.
+  await expect(
+    page.getByRole('button', { name: 'ENTRAR NA CORRIDA' })
+  ).toBeVisible()
   await expect(page.getByText('SALA AINDA FECHADA')).toHaveCount(0)
+  await expect(page.getByLabel('SEU NOME')).toHaveValue('Rafael')
+
+  await page.getByRole('button', { name: 'ENTRAR NA CORRIDA' }).click()
+  await expect(page).toHaveURL(new RegExp(`/e/${quiz.codigo}/jogo$`))
 })
 
 test('quem chega no meio da etapa participa dela, sem pontos do que já passou', async ({

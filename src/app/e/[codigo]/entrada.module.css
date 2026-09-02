@@ -108,6 +108,22 @@
   color: var(--texto-terciario);
 }
 
+/*
+ * O aviso de sala fechada divide a tela com o formulário, então não empurra
+ * nada para o rodapé: quem chega antes da hora escreve o nome do mesmo jeito.
+ */
+.aviso {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+  padding: 16px 18px;
+  background: var(--superficie);
+  border: 2px dashed var(--azul);
+  border-radius: var(--raio);
+}
+
 .aguardando {
   margin-top: auto;
   display: flex;
